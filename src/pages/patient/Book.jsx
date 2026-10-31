@@ -149,10 +149,10 @@ export default function Book() {
           <Button variant="outline" onClick={() => setStep(1)}>Change service</Button>
         </div>
         <p className="text-sm text-[#737373]">Booking: {selectedService?.name}</p>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardContent className="p-4">
-              <Calendar mode="single" selected={date} onSelect={setDate} disabled={disabledDay} />
+              <Calendar mode="single" selected={date} onSelect={setDate} disabled={disabledDay} className="w-full" />
               <p className="text-xs text-[#737373] mt-2">
                 Closed days: {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].filter((_, i) => !settings.openDays.includes(i)).join(", ")}
               </p>
@@ -163,11 +163,11 @@ export default function Book() {
               <>
                 <div>
                   <p className="text-xs uppercase text-[#525252] mb-2">Morning</p>
-                  <div className="grid grid-cols-3 gap-2">{morning.map(renderSlot)}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{morning.map(renderSlot)}</div>
                 </div>
                 <div>
                   <p className="text-xs uppercase text-[#525252] mb-2">Afternoon</p>
-                  <div className="grid grid-cols-3 gap-2">{afternoon.map(renderSlot)}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{afternoon.map(renderSlot)}</div>
                 </div>
               </>
             )}

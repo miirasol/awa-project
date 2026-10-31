@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
+import heroImg from "@/assets/dental clinic.jpg";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Landing() {
@@ -32,7 +33,7 @@ export default function Landing() {
             <Button variant="link" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}>View services</Button>
           </div>
         </div>
-        <div className="bg-white rounded-xl h-64 hidden md:block" />
+        <img src={heroImg} alt="Clinic" className="rounded-xl h-64 object-cover hidden md:block w-full" />
       </section>
       <section id="services">
         <h2 className="text-2xl font-medium mb-4">Services</h2>

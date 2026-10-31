@@ -13,11 +13,12 @@ export default function PatientLayout() {
     { label: "Profile settings", to: "/profile" },
   ];
   return (
-    <div className="min-h-screen bg-[#f2f2f2] flex flex-col md:flex-row">
-      <div className="md:hidden p-4 bg-white border-b border-[#e5e5e5]">
+    <div className="h-screen bg-[#f2f2f2] flex flex-col md:flex-row overflow-hidden">
+      <div className="md:hidden p-4 bg-white border-b border-[#e5e5e5] flex items-center justify-between">
         <button onClick={() => setOpen(!open)}><Menu /></button>
+        <Button size="sm" onClick={() => navigate("/book")}>Book Appointment</Button>
       </div>
-      <aside className={`${open ? "flex" : "hidden"} md:flex w-full md:w-[260px] bg-white border-b md:border-r border-[#e5e5e5] p-4 flex-col`}>
+      <aside className={`${open ? "flex" : "hidden"} md:flex w-full md:w-[260px] bg-white border-b md:border-r border-[#e5e5e5] p-4 flex-col overflow-hidden`}>
         <div className="flex items-center gap-3 mb-6">
           {profile?.avatarUrl ? (
             <img src={profile.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
@@ -29,6 +30,7 @@ export default function PatientLayout() {
             <div className="text-xs text-[#737373]">{profile?.email || user?.email}</div>
           </div>
         </div>
+        <Button className="w-full mb-3" onClick={() => navigate("/book")}>Book Appointment</Button>
         <nav className="space-y-1 flex-1">
           {items.map((it) => (
             <Link key={it.to} to={it.to} className="block px-3 py-2 rounded-lg text-sm hover:bg-[#f2f2f2]">
@@ -38,7 +40,7 @@ export default function PatientLayout() {
         </nav>
         <Button variant="outline" className="mt-4" onClick={() => { logout(); navigate("/"); }}>Log out</Button>
       </aside>
-      <main className="flex-1 p-8 max-w-[1100px]">
+      <main className="flex-1 p-8 max-w-[1100px] overflow-y-auto">
         <Outlet />
       </main>
     </div>
