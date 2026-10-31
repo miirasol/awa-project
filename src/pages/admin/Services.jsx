@@ -73,7 +73,7 @@ export default function Services() {
               {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
               <h3 className="font-semibold">{s.name}</h3>
               <p className="text-sm text-muted-foreground">{s.description}</p>
-              <p className="text-sm">₱{s.priceRange}</p>
+              <p className="text-sm">₱{s.priceRange.replace("-", " - ₱")}</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Switch checked={s.isActive} onCheckedChange={() => toggleActive(s)} />

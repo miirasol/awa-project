@@ -43,7 +43,7 @@ export default function Landing() {
                 {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded mb-2" />}
                 <h3 className="font-semibold">{s.name}</h3>
                 <p className="text-sm text-[#737373]">{s.description}</p>
-                <p className="text-sm mt-1">₱{s.priceRange}</p>
+                <p className="text-sm mt-1">₱{s.priceRange.replace("-", " - ₱")}</p>
               </CardContent>
             </Card>
           ))}

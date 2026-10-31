@@ -112,7 +112,7 @@ export default function Book() {
                 {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
                 <h3 className="font-semibold">{s.name}</h3>
                 <p className="text-sm text-[#737373]">{s.description}</p>
-                <p className="text-sm">₱{s.priceRange}</p>
+                <p className="text-sm">₱{s.priceRange.replace("-", " - ₱")}</p>
                 <Button onClick={() => { setSelectedService(s); setStep(2); }}>Select</Button>
               </CardContent>
             </Card>
