@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
-  const { login, googleSignIn, resetPassword } = useAuth();
+  const { login, googleSignIn, resetPassword, user, profile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || null;
@@ -17,21 +17,21 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
 
-  const afterLogin = (profile) => {
-    const target = from || (profile?.role === "admin" ? "/admin/appointments" : "/dashboard");
-    navigate(target, { replace: true });
-  };
+  useEffect(() => {
+    if (done && user && profile) {
+      const target = from || (profile.role === "admin" ? "/admin/appointments" : "/dashboard");
+      navigate(target, { replace: true });
+    }
+  }, [done, user, profile, from, navigate]);
 
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const cred = await login(email, password, remember);
-      const { getDoc, doc } = await import("firebase/firestore");
-      const { db } = await import("@/lib/firebase");
-      const snap = await getDoc(doc(db, "users", cred.user.uid));
-      afterLogin(snap.exists() ? snap.data() : null);
+      await login(email, password, remember);
+      setDone(true);
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -42,11 +42,8 @@ export default function Login() {
   const google = async () => {
     setLoading(true);
     try {
-      const cred = await googleSignIn();
-      const { getDoc, doc } = await import("firebase/firestore");
-      const { db } = await import("@/lib/firebase");
-      const snap = await getDoc(doc(db, "users", cred.user.uid));
-      afterLogin(snap.exists() ? snap.data() : null);
+      await googleSignIn();
+      setDone(true);
     } catch (err) {
       toast.error(err.message);
     } finally {

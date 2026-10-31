@@ -49,6 +49,7 @@ export default function Book() {
   }, []);
 
   useEffect(() => {
+    setSelectedSlot(null);
     if (!date || !settings) { setSlots([]); return; }
     const ds = toDateString(date);
     setSlots(generateSlots(settings, ds));
@@ -113,7 +114,7 @@ export default function Book() {
                 <h3 className="font-semibold">{s.name}</h3>
                 <p className="text-sm text-[#737373]">{s.description}</p>
                 <p className="text-sm">₱{s.priceRange.replace("-", " - ₱")}</p>
-                <Button onClick={() => { setSelectedService(s); setStep(2); }}>Select</Button>
+                <Button onClick={() => { setSelectedService(s); setSelectedSlot(null); setDate(null); setStep(2); }}>Select</Button>
               </CardContent>
             </Card>
           ))}
@@ -128,7 +129,9 @@ export default function Book() {
     const afternoon = slots.filter((t) => t >= "12:00");
     const renderSlot = (t) => {
       const isTaken = taken.has(t);
-      const isPast = ds === toDateString(new Date()) && t <= new Date().toTimeString().slice(0, 5);
+      const now = new Date();
+      const nowTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      const isPast = ds === toDateString(now) && t <= nowTime;
       const disabled = isTaken || isPast;
       return (
         <Button
@@ -146,7 +149,7 @@ export default function Book() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Pick a date and time</h1>
-          <Button variant="outline" onClick={() => setStep(1)}>Change service</Button>
+          <Button variant="outline" onClick={() => { setStep(1); setSelectedSlot(null); setDate(null); }}>Change service</Button>
         </div>
         <p className="text-sm text-[#737373]">Booking: {selectedService?.name}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

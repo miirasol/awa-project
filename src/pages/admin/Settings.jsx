@@ -16,7 +16,7 @@ export default function Settings() {
   const [form, setForm] = useState({
     clinicName: "", address: "", phone: "", email: "",
     openDays: [], openTime: "09:00", closeTime: "17:00",
-    breakStart: "", breakEnd: "", closedDates: [],
+    breakStart: "", breakEnd: "", closedDates: [], slotMinutes: 30,
   });
   const [newClosed, setNewClosed] = useState("");
   const [newClosedEnd, setNewClosedEnd] = useState("");
@@ -24,7 +24,7 @@ export default function Settings() {
   useEffect(() => {
     (async () => {
       const snap = await getDoc(doc(db, "settings", "clinic"));
-      if (snap.exists()) setForm({ ...form, ...snap.data() });
+      if (snap.exists()) setForm((prev) => ({ ...prev, ...snap.data(), slotMinutes: snap.data().slotMinutes ?? prev.slotMinutes }));
     })();
   }, []);
 

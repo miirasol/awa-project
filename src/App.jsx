@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import PublicLayout from "@/components/layout/PublicLayout.jsx";
 import PatientLayout from "@/components/layout/PatientLayout.jsx";
@@ -11,11 +12,11 @@ import Register from "@/pages/guest/Register.jsx";
 import Dashboard from "@/pages/patient/Dashboard.jsx";
 import Book from "@/pages/patient/Book.jsx";
 import Profile from "@/pages/patient/Profile.jsx";
-import Appointments from "@/pages/admin/Appointments.jsx";
-import Services from "@/pages/admin/Services.jsx";
-import Settings from "@/pages/admin/Settings.jsx";
-import Patients from "@/pages/admin/Patients.jsx";
-import PatientDetail from "@/pages/admin/PatientDetail.jsx";
+const Appointments = lazy(() => import("@/pages/admin/Appointments.jsx"));
+const Services = lazy(() => import("@/pages/admin/Services.jsx"));
+const Settings = lazy(() => import("@/pages/admin/Settings.jsx"));
+const Patients = lazy(() => import("@/pages/admin/Patients.jsx"));
+const PatientDetail = lazy(() => import("@/pages/admin/PatientDetail.jsx"));
 import NotFound from "@/pages/NotFound.jsx";
 
 const titles = {
@@ -57,6 +58,7 @@ export default function App() {
 	return (
 		<>
 			<PageTitle />
+			<Suspense fallback={<Skeleton className="h-screen w-full" />}>
 			<Routes>
 				<Route element={<PublicLayout />}>
 					<Route path="/" element={<Landing />} />
@@ -103,6 +105,7 @@ export default function App() {
 				</Route>
 				<Route path="*" element={<NotFound />} />
 			</Routes>
+			</Suspense>
 		</>
 	);
 }

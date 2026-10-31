@@ -19,7 +19,7 @@ export function generateSlots(settings, dateStr) {
   const open = toMin(settings.openTime), close = toMin(settings.closeTime);
   const bs = settings.breakStart ? toMin(settings.breakStart) : null;
   const be = settings.breakEnd ? toMin(settings.breakEnd) : null;
-  const step = settings.slotMinutes;
+  const step = settings.slotMinutes ?? 30;
   const out = [];
   for (let t = open; t + step <= close; t += step) {
     if (bs !== null && t < be && t + step > bs) continue;

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { Link } from "react-router-dom";
 import { collection, onSnapshot, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { approveCancellation, rejectCancellation, markCompleted, markNoShow, cancelAppointment } from "@/lib/appointments";
-import { slotId } from "@/lib/dates";
+import { slotId, toDateString } from "@/lib/dates";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,7 @@ export default function Appointments() {
   const phoneOf = (uid) => users[uid]?.phone || "";
 
   const now = new Date();
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = toDateString(new Date());
   const cancellationRequests = appts.filter((a) => a.status === "cancel_requested").sort((a, b) => a.startAt.toDate() - b.startAt.toDate());
   const todayAppts = appts.filter((a) => a.date === todayStr && a.status === "confirmed").sort((a, b) => a.time.localeCompare(b.time));
   const upcomingConfirmed = appts.filter((a) => a.status === "confirmed" && a.startAt.toDate() > now).length;
@@ -78,7 +79,7 @@ export default function Appointments() {
             <Card key={a.id}>
               <CardContent className="p-4 flex justify-between items-center">
                 <div>
-                  <p className="font-semibold">{nameOf(a.patientId)} · {phoneOf(a.patientId)}</p>
+                  <p className="font-semibold"><Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link> · {phoneOf(a.patientId)}</p>
                   <p className="text-sm text-[#737373]">{a.date} {a.time} · {a.serviceName}</p>
                   {a.reason && <p className="text-sm">Reason: {a.reason}</p>}
                 </div>
@@ -96,7 +97,7 @@ export default function Appointments() {
             <Card key={a.id}>
               <CardContent className="p-4 flex justify-between items-center">
                 <div>
-                  <p className="font-semibold">{a.time} · {nameOf(a.patientId)}</p>
+                  <p className="font-semibold">{a.time} · <Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></p>
                   <p className="text-sm text-[#737373]">{a.serviceName}</p>
                 </div>
                 <Badge>{a.status}</Badge>
@@ -140,7 +141,7 @@ export default function Appointments() {
                   <TableRow key={a.id}>
                     <TableCell>{a.date}</TableCell>
                     <TableCell>{a.time}</TableCell>
-                    <TableCell>{nameOf(a.patientId)}</TableCell>
+                    <TableCell><Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></TableCell>
                     <TableCell>{a.serviceName}</TableCell>
                     <TableCell><Badge variant="outline">{a.status}</Badge></TableCell>
                     <TableCell className="space-x-2">

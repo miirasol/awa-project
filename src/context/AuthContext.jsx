@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -10,7 +10,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/lib/firebase";
 
 const AuthContext = createContext(null);
@@ -19,32 +19,61 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const profileUnsubRef = useRef(null);
+  const creatingRef = useRef(new Set());
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
-      if (u) {
-        const ref = doc(db, "users", u.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          setProfile(snap.data());
-        } else {
-          const newProfile = {
-            email: u.email || "",
-            role: "patient",
-            fullName: u.displayName || "",
-            phone: "",
-            createdAt: serverTimestamp(),
-          };
-          await setDoc(ref, newProfile);
-          setProfile(newProfile);
-        }
-      } else {
-        setProfile(null);
+    const unsubAuth = onAuthStateChanged(auth, (u) => {
+      if (profileUnsubRef.current) {
+        profileUnsubRef.current();
+        profileUnsubRef.current = null;
       }
-      setLoading(false);
+      setUser(u);
+      if (!u) {
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      const ref = doc(db, "users", u.uid);
+      profileUnsubRef.current = onSnapshot(
+        ref,
+        async (snap) => {
+          if (snap.exists()) {
+            setProfile(snap.data());
+            setLoading(false);
+            return;
+          }
+          if (!creatingRef.current.has(u.uid)) {
+            creatingRef.current.add(u.uid);
+            try {
+              await setDoc(
+                ref,
+                {
+                  email: u.email || "",
+                  role: "patient",
+                  fullName: u.displayName || "",
+                  phone: "",
+                  createdAt: serverTimestamp(),
+                },
+                { merge: true }
+              );
+            } catch (err) {
+              console.error(err);
+              await signOut(auth);
+            }
+          }
+        },
+        (err) => {
+          console.error(err);
+          signOut(auth);
+        }
+      );
     });
-    return unsub;
+    return () => {
+      unsubAuth();
+      if (profileUnsubRef.current) profileUnsubRef.current();
+    };
   }, []);
 
   const login = async (email, password, remember) => {
@@ -67,16 +96,7 @@ export function AuthProvider({ children }) {
   const googleSignIn = async () => {
     const cred = await signInWithPopup(auth, googleProvider);
     const ref = doc(db, "users", cred.user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      await setDoc(ref, {
-        email: cred.user.email || "",
-        role: "patient",
-        fullName: cred.user.displayName || "",
-        phone: "",
-        createdAt: serverTimestamp(),
-      });
-    }
+    // best-effort; onSnapshot handles creation if missing
     return cred;
   };
 
