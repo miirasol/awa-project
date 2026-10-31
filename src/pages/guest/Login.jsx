@@ -73,13 +73,13 @@ export default function Login() {
         <CardHeader><CardTitle>Log in</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
-            <div>
-              <Label>Email</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <div className="space-y-1">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-            <div>
-              <Label>Password</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <div className="flex items-center gap-2">
               <Checkbox checked={remember} onCheckedChange={setRemember} />

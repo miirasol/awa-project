@@ -52,11 +52,11 @@ export default function Register() {
         <CardHeader><CardTitle>Create account</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
-            <div><Label>Full name</Label><Input value={fullName} onChange={(e) => setFullName(e.target.value)} required /></div>
-            <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-            <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} required /></div>
-            <div><Label>Password</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
-            <div><Label>Confirm password</Label><Input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required /></div>
+            <div className="space-y-1"><Label htmlFor="fullName">Full name</Label><Input value={fullName} id="fullName" onChange={(e) => setFullName(e.target.value)} required /></div>
+            <div className="space-y-1"><Label htmlFor="email">Email</Label><Input type="email" value={email} id="email" onChange={(e) => setEmail(e.target.value)} required /></div>
+            <div className="space-y-1"><Label htmlFor="phone">Phone</Label><Input value={phone} id="phone" onChange={(e) => setPhone(e.target.value)} required /></div>
+            <div className="space-y-1"><Label htmlFor="password">Password</Label><Input type="password" value={password} id="password" onChange={(e) => setPassword(e.target.value)} required /></div>
+            <div className="space-y-1"><Label htmlFor="confirm">Confirm password</Label><Input type="password" value={confirm} id="confirm" onChange={(e) => setConfirm(e.target.value)} required /></div>
             <Button type="submit" disabled={loading} className="w-full">Create account</Button>
           </form>
           <div className="my-4 text-center text-sm text-muted-foreground">or</div>
