@@ -1,16 +1,26 @@
-# React + Vite
+# Dental Clinic Appointment System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web app for a single-dentist clinic. Patients can register, book 30-minute appointments, view their dashboard and visit history, and manage their profile. The dentist (admin) manages appointments, patients, services, and clinic settings.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env` and fill in Firebase and Cloudinary values.
+3. Run:
+   ```bash
+   npm run dev
+   ```
 
-## React Compiler
+## Environment variables
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+See `.env.example` for the full list: `VITE_FIREBASE_*` and `VITE_CLOUDINARY_*`.
 
-## Expanding the ESLint configuration
+## Making an admin account
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Register a normal account in the app.
+2. In the Firebase console, open Firestore and find `users/{uid}`.
+3. Set `role` to `"admin"`.
+4. Sign in again; the user lands on `/admin/appointments`.

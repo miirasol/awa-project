@@ -1,0 +1,127 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Slot IDs look like "2026-11-04_0930" (date + "_" + time without the colon)
+    function slotIdFor(date, time) {
+      return date + '_' + time.replace(':', '');
+    }
+
+    // ---------- users ----------
+    // Admin accounts are created by hand in the console (set role = 'admin').
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Anyone registering can only make themselves a patient
+      allow create: if isOwner(uid)
+        && request.resource.data.role == 'patient';
+
+      // Users can edit their own profile but never change their role
+      allow update: if (isOwner(uid)
+          && request.resource.data.role == resource.data.role)
+        || isAdmin();
+
+      allow delete: if false;
+    }
+
+    // ---------- services & settings (public read for the landing page) ----------
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---------- slots (double-booking guard) ----------
+
+    match /slots/{slotId} {
+      allow read: if isSignedIn();
+
+      // A patient can claim a slot only as part of booking their own appointment
+      allow create: if isSignedIn()
+        && request.resource.data.patientId == request.auth.uid
+        && slotId == slotIdFor(request.resource.data.date, request.resource.data.time)
+        && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.patientId == request.auth.uid
+        && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.status == 'confirmed';
+
+      // Slots are never edited, so a second booking attempt on the same ID fails
+      allow update: if false;
+
+      // Freed by the admin, or by the patient only when their appointment
+      // ends up cancelled in the same batch
+      allow delete: if isAdmin()
+        || (isSignedIn()
+            && resource.data.patientId == request.auth.uid
+            && getAfter(/databases/$(database)/documents/appointments/$(resource.data.appointmentId)).data.status == 'cancelled');
+    }
+
+    // ---------- appointments ----------
+
+    match /appointments/{appointmentId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.patientId == request.auth.uid);
+
+      // Auto-confirmed booking, only for yourself, only in the future,
+      // and only together with the matching slot document
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly([
+             'patientId', 'serviceId', 'serviceName', 'date', 'time',
+             'startAt', 'status', 'reason', 'photoUrl', 'createdAt'])
+        && request.resource.data.patientId == request.auth.uid
+        && request.resource.data.status == 'confirmed'
+        && request.resource.data.startAt > request.time
+        && request.resource.data.createdAt == request.time
+        && existsAfter(/databases/$(database)/documents/slots/$(slotIdFor(request.resource.data.date, request.resource.data.time)));
+
+      allow update:
+        // Admin: status changes only (completed, no_show, cancelled, back to confirmed)
+        if (isAdmin()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+        // Patient: status changes only, and only these two transitions
+        || (isSignedIn()
+            && resource.data.patientId == request.auth.uid
+            && resource.data.status == 'confirmed'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+            && (
+              // direct cancel: more than 24 hours before the appointment
+              (request.resource.data.status == 'cancelled'
+                && resource.data.startAt > request.time + duration.value(24, 'h'))
+              // cancellation request: admin decides
+              || (request.resource.data.status == 'cancel_requested'
+                && resource.data.startAt > request.time)
+            ));
+
+      allow delete: if false;
+    }
+
+    // ---------- visit records (admin writes, patient reads own) ----------
+
+    match /visitRecords/{recordId} {
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.patientId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+  }
+}

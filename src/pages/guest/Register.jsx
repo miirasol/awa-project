@@ -1,0 +1,71 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/context/AuthContext";
+
+export default function Register() {
+  const { register, googleSignIn } = useAuth();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (password !== confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      const cred = await register(email, password, fullName, phone);
+      navigate(cred.user ? "/dashboard" : "/dashboard", { replace: true });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const google = async () => {
+    setLoading(true);
+    try {
+      await googleSignIn();
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto mt-10">
+      <Card>
+        <CardHeader><CardTitle>Create account</CardTitle></CardHeader>
+        <CardContent>
+          <form onSubmit={submit} className="space-y-4">
+            <div><Label>Full name</Label><Input value={fullName} onChange={(e) => setFullName(e.target.value)} required /></div>
+            <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+            <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} required /></div>
+            <div><Label>Password</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+            <div><Label>Confirm password</Label><Input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required /></div>
+            <Button type="submit" disabled={loading} className="w-full">Create account</Button>
+          </form>
+          <div className="my-4 text-center text-sm text-muted-foreground">or</div>
+          <Button variant="outline" onClick={google} disabled={loading} className="w-full">Continue with Google</Button>
+          <p className="mt-4 text-sm text-center">
+            Already have an account? <Link to="/login" className="text-blue-600">Log in</Link>
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
