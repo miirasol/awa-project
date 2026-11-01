@@ -8,7 +8,7 @@ import { canCancelDirectly, canRequestCancel } from "@/lib/dates";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import StatusBadge from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	Dialog,
@@ -18,7 +18,7 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
-import { statusLabel } from "@/lib/format";
+
 
 export default function Dashboard() {
 	const { user } = useAuth();
@@ -150,6 +150,7 @@ export default function Dashboard() {
 									</p>
 								</div>
 								<div className="flex items-center gap-2">
+									<StatusBadge status={a.status} />
 									<Button
 										variant="outline"
 										size="sm"
@@ -157,7 +158,6 @@ export default function Dashboard() {
 									>
 										Details
 									</Button>
-									<Badge variant="outline">{statusLabel(a.status)}</Badge>{" "}
 									{a.status === "confirmed" && canCancelDirectly(a) && (
 										<Button
 											variant="outline"
@@ -210,7 +210,7 @@ export default function Dashboard() {
 								<CardContent className="p-4 break-words">
 									<div className="flex justify-between items-center gap-2">
 										<p className="font-semibold min-w-0">{label}</p>
-										<Badge variant="outline">Completed</Badge>
+										<StatusBadge status="completed" />
 									</div>
 									<p className="text-sm text-[#6b6b6b]">{dateStr}</p>
 									{r?.procedure && (
@@ -265,14 +265,27 @@ export default function Dashboard() {
 				{" "}
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Confirm</DialogTitle>
+						<DialogTitle>
+							{action === "cancel"
+								? "Cancel this appointment?"
+								: "Request cancellation?"}
+						</DialogTitle>
 					</DialogHeader>
-					<p>Are you sure?</p>
+					{confirmAppt && (
+						<p className="break-words text-[#6b6b6b]">
+							{confirmAppt.serviceName} · {confirmAppt.date} {confirmAppt.time}
+						</p>
+					)}
+					<p className="text-sm text-[#6b6b6b]">
+						{action === "cancel"
+							? "This will free up the time slot."
+							: "The clinic will review your request."}
+					</p>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => setConfirmAppt(null)}>
-							No
+							No, keep it
 						</Button>
-						<Button onClick={doCancel}>Yes</Button>
+						<Button variant="destructive" onClick={doCancel}>Yes</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
