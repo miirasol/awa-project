@@ -100,7 +100,7 @@ export default function Landing() {
             <Card className="rounded-xl border">
               <CardContent className="p-4">
                 <p className="text-xs text-[#6b6b6b]">Open days</p>
-                <p className="font-semibold">{(settings.openDays || []).map((d) => days[d]).join(", ")}</p>
+                <p className="font-semibold">{[...(settings.openDays || [])].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b)).map((d) => days[d]).join(", ")}</p>
               </CardContent>
             </Card>
             <Card className="rounded-xl border">
@@ -112,7 +112,11 @@ export default function Landing() {
             <Card className="rounded-xl border">
               <CardContent className="p-4">
                 <p className="text-xs text-[#6b6b6b]">Break</p>
-                <p className="font-semibold">{to12Hour(settings.breakStart)} – {to12Hour(settings.breakEnd)}</p>
+                <p className="font-semibold">
+                  {settings.breakStart && settings.breakEnd
+                    ? `${to12Hour(settings.breakStart)} – ${to12Hour(settings.breakEnd)}`
+                    : "No break"}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -133,9 +137,11 @@ export default function Landing() {
             </div>
             <div>
               <p className="text-sm font-semibold mb-2">Clinic hours</p>
-              <p className="text-sm text-[#6b6b6b]">{(settings?.openDays || []).map((d) => days[d]).join(", ")}</p>
+              <p className="text-sm text-[#6b6b6b]">{[...(settings?.openDays || [])].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b)).map((d) => days[d]).join(", ")}</p>
               <p className="text-sm text-[#6b6b6b]">{to12Hour(settings?.openTime)} – {to12Hour(settings?.closeTime)}</p>
-              <p className="text-sm text-[#6b6b6b]">Break: {to12Hour(settings?.breakStart)} – {to12Hour(settings?.breakEnd)}</p>
+              <p className="text-sm text-[#6b6b6b]">
+              Break: {settings?.breakStart && settings?.breakEnd ? `${to12Hour(settings.breakStart)} – ${to12Hour(settings.breakEnd)}` : "No break"}
+            </p>
             </div>
             <div>
               <p className="text-sm font-semibold mb-2">Account</p>

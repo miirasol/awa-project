@@ -11,6 +11,7 @@ import { seedSampleData } from "@/lib/seed";
 import { toDateString as toDateStr } from "@/lib/dates";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 export default function Settings() {
   const [form, setForm] = useState({
@@ -88,18 +89,28 @@ export default function Settings() {
         <CardHeader><CardTitle>Schedule</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2 flex-wrap">
-            {DAYS.map((d, i) => (
-              <label key={d} className="flex items-center gap-1">
+            {DAY_ORDER.map((i) => (
+              <label key={i} className="flex items-center gap-1">
                 <Checkbox checked={form.openDays.includes(i)} onCheckedChange={() => toggleDay(i)} />
-                {d}
+                {DAYS[i]}
               </label>
             ))}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><Label>Open time</Label><Input type="time" className="w-full" value={form.openTime} onChange={(e) => setForm({ ...form, openTime: e.target.value })} /></div>
             <div><Label>Close time</Label><Input type="time" className="w-full" value={form.closeTime} onChange={(e) => setForm({ ...form, closeTime: e.target.value })} /></div>
-            <div><Label>Break start</Label><Input type="time" className="w-full" value={form.breakStart || ""} onChange={(e) => setForm({ ...form, breakStart: e.target.value })} /></div>
-            <div><Label>Break end</Label><Input type="time" className="w-full" value={form.breakEnd || ""} onChange={(e) => setForm({ ...form, breakEnd: e.target.value })} /></div>
+            <div className="flex items-center gap-2 sm:col-span-2">
+              <Checkbox
+                checked={!form.breakStart && !form.breakEnd}
+                onCheckedChange={(v) => {
+                  if (v) setForm((f) => ({ ...f, breakStart: "", breakEnd: "" }));
+                  else setForm((f) => ({ ...f, breakStart: f.breakStart || "12:00", breakEnd: f.breakEnd || "13:00" }));
+                }}
+              />
+              <span className="text-sm">No break</span>
+            </div>
+            <div><Label>Break start</Label><Input type="time" className="w-full" value={form.breakStart || ""} onChange={(e) => setForm({ ...form, breakStart: e.target.value })} disabled={!form.breakStart && !form.breakEnd} /></div>
+            <div><Label>Break end</Label><Input type="time" className="w-full" value={form.breakEnd || ""} onChange={(e) => setForm({ ...form, breakEnd: e.target.value })} disabled={!form.breakStart && !form.breakEnd} /></div>
           </div>
           <p className="text-sm text-muted-foreground">Slot length: 30 min (fixed)</p>
           <Button onClick={saveSchedule}>Save schedule</Button>
