@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Menu, X } from "lucide-react";
 
 export default function PublicLayout() {
-	const { user, profile, logout } = useAuth();
+	const { user, profile, logout, loading: authLoading } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [open, setOpen] = useState(false);
@@ -73,7 +74,12 @@ export default function PublicLayout() {
 						))}
 					</nav>
 					<div className="hidden md:flex ml-auto gap-3">
-						{user ? (
+						{authLoading ? (
+							<>
+								<Skeleton className="h-9 w-24" />
+								<Skeleton className="h-9 w-24" />
+							</>
+						) : user ? (
 							<>
 								<Button variant="outline" onClick={() => navigate(profile?.role === "admin" ? "/admin/appointments" : "/dashboard")}>
 									Dashboard
@@ -127,7 +133,12 @@ export default function PublicLayout() {
 							))}
 						</nav>
 						<div className="flex flex-col gap-2 pt-2">
-							{user ? (
+							{authLoading ? (
+								<>
+									<Skeleton className="h-9 w-full" />
+									<Skeleton className="h-9 w-full" />
+								</>
+							) : user ? (
 								<>
 									<Button
 										variant="outline"
