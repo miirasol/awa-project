@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
+import { authErrorMessage } from "@/lib/authErrors";
 
 export default function Register() {
   const { register, googleSignIn } = useAuth();
@@ -19,6 +20,10 @@ export default function Register() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
     if (password !== confirm) {
       toast.error("Passwords do not match");
       return;
@@ -28,7 +33,7 @@ export default function Register() {
       const cred = await register(email, password, fullName, phone);
       navigate(cred.user ? "/dashboard" : "/dashboard", { replace: true });
     } catch (err) {
-      toast.error(err.message);
+      toast.error(authErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -40,7 +45,7 @@ export default function Register() {
       await googleSignIn();
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      toast.error(err.message);
+      toast.error(authErrorMessage(err));
     } finally {
       setLoading(false);
     }

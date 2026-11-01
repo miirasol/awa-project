@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/context/AuthContext";
+import { authErrorMessage } from "@/lib/authErrors";
 
 export default function Login() {
   const { login, googleSignIn, resetPassword, user, profile } = useAuth();
@@ -33,7 +34,7 @@ export default function Login() {
       await login(email, password, remember);
       setDone(true);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(authErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ export default function Login() {
       await googleSignIn();
       setDone(true);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(authErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -60,7 +61,7 @@ export default function Login() {
       await resetPassword(email);
       toast.success("Password reset email sent");
     } catch (err) {
-      toast.error(err.message);
+      toast.error(authErrorMessage(err));
     }
   };
 
