@@ -159,39 +159,41 @@ const [loading, setLoading] = useState(true);
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<StatusBadge status={a.status} />
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => setDetailsAppt(a)}
-									>
-										Details
-									</Button>
-									{a.status === "confirmed" && canCancelDirectly(a) && (
+									<div className="flex items-center gap-2 flex-nowrap">
 										<Button
 											variant="outline"
 											size="sm"
-											onClick={() => {
-												setConfirmAppt(a);
-												setAction("cancel");
-											}}
+											onClick={() => setDetailsAppt(a)}
 										>
-											Cancel
+											Details
 										</Button>
-									)}
-									{a.status === "confirmed" &&
-										!canCancelDirectly(a) &&
-										canRequestCancel(a) && (
+										{a.status === "confirmed" && canCancelDirectly(a) && (
 											<Button
 												variant="outline"
 												size="sm"
 												onClick={() => {
 													setConfirmAppt(a);
-													setAction("request");
+													setAction("cancel");
 												}}
 											>
-												Request cancellation
+												Cancel
 											</Button>
 										)}
+										{a.status === "confirmed" &&
+											!canCancelDirectly(a) &&
+											canRequestCancel(a) && (
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={() => {
+														setConfirmAppt(a);
+														setAction("request");
+													}}
+												>
+													Request cancellation
+												</Button>
+											)}
+									</div>
 								</div>
 							</CardContent>
 						</Card>
