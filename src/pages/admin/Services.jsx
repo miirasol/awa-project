@@ -16,18 +16,22 @@ import { LIMITS, tooLong } from "@/lib/limits";
 
 export default function Services() {
   const [services, setServices] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: "", description: "", priceStart: "", priceMax: "", imageUrl: "", isActive: true });
   const [file, setFile] = useState(null);
 const [loading, setLoading] = useState(true);
 const [confirmDelete, setConfirmDelete] = useState(false);
+const [deleteWarning, setDeleteWarning] = useState(false);
 
   const load = async () => {
     setLoading(true);
     try {
       const snap = await getDocs(collection(db, "services"));
       setServices(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const as = await getDocs(collection(db, "appointments"));
+      setAppointments(as.docs.map((d) => ({ id: d.id, ...d.data() })));
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -76,6 +80,16 @@ const [confirmDelete, setConfirmDelete] = useState(false);
   const toggleActive = async (s) => {
     await updateDoc(doc(db, "services", s.id), { isActive: !s.isActive });
     load();
+  };
+
+  const requestDelete = () => {
+    if (!editing) return;
+    const active = appointments.filter((a) => a.serviceId === editing.id && (a.status === "confirmed" || a.status === "cancel_requested"));
+    if (active.length > 0) {
+      setDeleteWarning(true);
+    } else {
+      setConfirmDelete(true);
+    }
   };
 
   const deleteService = async () => {
@@ -144,7 +158,7 @@ const [confirmDelete, setConfirmDelete] = useState(false);
           </div>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
             {editing && (
-              <Button variant="destructive" onClick={() => setConfirmDelete(true)}>Delete service</Button>
+              <Button variant="destructive" onClick={requestDelete}>Delete service</Button>
             )}
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -160,6 +174,18 @@ const [confirmDelete, setConfirmDelete] = useState(false);
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDelete(false)}>Cancel</Button>
             <Button variant="destructive" onClick={deleteService}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={deleteWarning} onOpenChange={setDeleteWarning}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete service with active appointments?</DialogTitle></DialogHeader>
+          <p className="text-sm text-[#6b6b6b]">
+            This service has active appointments. It won't be bookable anymore, but it won't affect existing listings.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteWarning(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => { setDeleteWarning(false); deleteService(); }}>Delete anyway</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
