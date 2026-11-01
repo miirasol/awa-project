@@ -77,6 +77,7 @@ function Empty({ children }) {
 export default function Appointments() {
   const [appts, setAppts] = useState([]);
   const [users, setUsers] = useState({});
+  const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
   const [tab, setTab] = useState("today");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -90,6 +91,7 @@ export default function Appointments() {
   useEffect(() => {
     const unsubAppts = onSnapshot(collection(db, "appointments"), (snap) => {
       setAppts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setLoading(false);
     });
     const unsubUsers = onSnapshot(collection(db, "users"), (snap) => {
       const map = {};
