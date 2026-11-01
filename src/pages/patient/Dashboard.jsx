@@ -8,6 +8,7 @@ import { canCancelDirectly, canRequestCancel } from "@/lib/dates";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import StatusBadge from "@/components/StatusBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -28,6 +29,7 @@ export default function Dashboard() {
 	const [confirmAppt, setConfirmAppt] = useState(null);
 	const [action, setAction] = useState(null);
 	const [detailsAppt, setDetailsAppt] = useState(null);
+const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		if (!user) return;
 		const q = query(
@@ -36,6 +38,7 @@ export default function Dashboard() {
 		);
 		const unsub = onSnapshot(q, (snap) => {
 			setAppts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+			setLoading(false);
 		});
 		const rq = query(
 			collection(db, "visitRecords"),
@@ -43,6 +46,7 @@ export default function Dashboard() {
 		);
 		const unsub2 = onSnapshot(rq, (snap) => {
 			setRecords(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+			setLoading(false);
 		});
 		return () => {
 			unsub();
@@ -107,6 +111,8 @@ export default function Dashboard() {
 		setConfirmAppt(null);
 		setAction(null);
 	};
+
+	if (loading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>;
 
 	return (
 		<div className="space-y-6">
