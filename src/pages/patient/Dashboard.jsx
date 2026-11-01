@@ -157,7 +157,7 @@ const [loading, setLoading] = useState(true);
 										{a.date} {a.time}
 									</p>
 								</div>
-								<div className="flex flex-wrap items-center gap-2">
+								<div className="flex flex-wrap items-center gap-2 justify-end">
 									<StatusBadge status={a.status} />
 									<div className="flex items-center gap-2 flex-nowrap">
 										<Button
