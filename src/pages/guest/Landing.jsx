@@ -84,9 +84,6 @@ export default function Landing() {
       </section>
       <section id="about" className={container + " scroll-mt-20"}>
         <h2 className="text-2xl font-semibold mb-4">About Us</h2>
-        <p className="text-sm text-[#6b6b6b] mb-4">
-          {settings?.aboutText || "Quality dental care, from check-ups to specialized treatments."}
-        </p>
         <h3 className="text-lg font-semibold mb-3">Our specialties</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
           {specialties.map((sp) => (
