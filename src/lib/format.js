@@ -2,7 +2,11 @@ export function formatPrice(priceRange) {
   if (!priceRange) return "";
   const parts = String(priceRange).split("-").map((p) => p.trim()).filter(Boolean);
   if (parts.length === 0) return "";
-  const formatted = parts.map((p) => "₱" + Number(p).toLocaleString("en-PH"));
+  const formatted = parts.map((p) => {
+    const n = Number(p);
+    if (Number.isNaN(n)) return "₱" + p;
+    return "₱" + n.toLocaleString("en-PH");
+  });
   return formatted.join(" – ");
 }
 

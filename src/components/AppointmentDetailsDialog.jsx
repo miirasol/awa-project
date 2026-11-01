@@ -16,7 +16,7 @@ export default function AppointmentDetailsDialog({ open, onOpenChange, appointme
             <p><span className="text-[#6b6b6b]">Status:</span> <Badge variant="outline">{statusLabel(a.status)}</Badge></p>
             {patientName && <p><span className="text-[#6b6b6b]">Patient:</span> {patientName}</p>}
             {a.reason && <p><span className="text-[#6b6b6b]">Reason:</span> {a.reason}</p>}
-            {a.photoUrl && <img src={a.photoUrl} alt="" className="w-32 h-32 object-cover rounded" />}
+            {a.photoUrl && <img src={a.photoUrl} alt="Patient photo" className="w-32 h-32 object-cover rounded" />}
             {record && (
               <div className="pt-2 border-t space-y-1">
                 <p className="font-semibold">Visit record</p>
@@ -25,7 +25,7 @@ export default function AppointmentDetailsDialog({ open, onOpenChange, appointme
                 {record.nextVisitSuggestion && <p className="text-[#6b6b6b]">Next: {record.nextVisitSuggestion}</p>}
                 {record.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
-                    {record.attachmentUrls.map((u, i) => <img key={i} src={u} alt="" className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}
+                    {record.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}
                   </div>
                 )}
               </div>

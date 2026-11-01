@@ -96,7 +96,7 @@ export default function PatientDetail() {
     <div className="space-y-6">
       <Card>
         <CardContent className="p-4 flex items-center gap-4">
-          {patient.avatarUrl && <img src={patient.avatarUrl} alt="" className="w-16 h-16 rounded-full object-cover" />}
+          {patient.avatarUrl && <img src={patient.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />}
           <div>
             <h1 className="text-2xl font-semibold">{patient.fullName}</h1>
             <p className="text-sm text-[#6b6b6b]">{patient.email} · {patient.phone}</p>
@@ -129,7 +129,7 @@ export default function PatientDetail() {
                 {r.nextVisitSuggestion && <p className="text-sm text-[#6b6b6b]">Next: {r.nextVisitSuggestion}</p>}
                 {r.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt="" className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}                  </div>
+                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}                  </div>
                 )}
                 <Button size="sm" variant="outline" onClick={() => openEdit(r)}>Edit</Button>
               </CardContent>
@@ -157,7 +157,7 @@ export default function PatientDetail() {
             <div><Label>Images</Label><Input type="file" accept="image/*" multiple onChange={(e) => setFiles(Array.from(e.target.files))} /></div>
             {existingUrls.length > 0 && (
               <div className="flex gap-2">
-                {existingUrls.map((u, i) => <img key={i} src={u} alt="" className="w-12 h-12 object-cover rounded" />)}
+                {existingUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-12 h-12 object-cover rounded" />)}
               </div>
             )}
           </div>

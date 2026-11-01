@@ -18,8 +18,6 @@ export default function Landing() {
   }, [location.hash]);
   const [settings, setSettings] = useState(null);
   const [services, setServices] = useState([]);
-  const [user, setUser] = useState(null);
-
   useEffect(() => {
     (async () => {
       const s = await getDoc(doc(db, "settings", "clinic"));

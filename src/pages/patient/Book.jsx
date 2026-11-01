@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
-import { generateSlots, toDateString, slotId } from "@/lib/slots";
+import { generateSlots, toDateString } from "@/lib/slots";
 import { bookAppointment, countUpcomingConfirmed } from "@/lib/appointments";
 import { uploadImage } from "@/lib/cloudinary";
 import { formatPrice } from "@/lib/format";

@@ -50,7 +50,7 @@ export default function Profile() {
             <div>
               <Label>Avatar</Label>
               <Input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files[0])} />
-              {profile?.avatarUrl && <img src={profile.avatarUrl} alt="" className="w-16 h-16 rounded-full mt-2" />}
+              {profile?.avatarUrl && <img src={profile.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full mt-2" />}
             </div>
             <div><Label>Full name</Label><Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} /></div>
             <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { cancelAppointment, requestCancellation } from "@/lib/appointments";
 import { canCancelDirectly, canRequestCancel } from "@/lib/dates";
@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
-import { statusLabel, formatDate, formatTime } from "@/lib/format";
+import { statusLabel } from "@/lib/format";
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -50,8 +50,9 @@ export default function Dashboard() {
     const orphanRecords = records.filter((r) => !completed.some((a) => a.id === r.appointmentId));
     orphanRecords.forEach((r) => items.push({ kind: "record", record: r, appt: null }));
     items.sort((x, y) => {
-      const dx = x.appt ? x.appt.startAt.toDate() : new Date(x.record.date);
-      const dy = y.appt ? y.appt.startAt.toDate() : new Date(y.record.date);
+      const parseDate = (s) => { const [yy, mm, dd] = String(s).split("-").map(Number); return new Date(yy, mm - 1, dd); };
+      const dx = x.appt ? x.appt.startAt.toDate() : parseDate(x.record.date);
+      const dy = y.appt ? y.appt.startAt.toDate() : parseDate(y.record.date);
       return dy - dx;
     });
     return items;
@@ -130,7 +131,7 @@ export default function Dashboard() {
                 {r?.nextVisitSuggestion && <p className="text-sm text-[#6b6b6b]">Next: {r.nextVisitSuggestion}</p>}
                 {r?.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt="" className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}
+                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}
                   </div>
                 )}
                 {a && <Button className="mt-2" variant="outline" size="sm" onClick={() => setDetailsAppt(a)}>Details</Button>}
