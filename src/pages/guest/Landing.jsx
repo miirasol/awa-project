@@ -5,6 +5,7 @@ import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/dental clinic.jpg";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice, to12Hour } from "@/lib/format";
 
 export default function Landing() {
@@ -18,12 +19,19 @@ export default function Landing() {
   }, [location.hash]);
   const [settings, setSettings] = useState(null);
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      const s = await getDoc(doc(db, "settings", "clinic"));
-      if (s.exists()) setSettings(s.data());
-      const sv = await getDocs(collection(db, "services"));
-      setServices(sv.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.isActive));
+      try {
+        const s = await getDoc(doc(db, "settings", "clinic"));
+        if (s.exists()) setSettings(s.data());
+        const sv = await getDocs(collection(db, "services"));
+        setServices(sv.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.isActive));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -38,6 +46,8 @@ export default function Landing() {
   ];
 
   const container = "mx-auto w-full max-w-[1140px] px-6";
+
+  if (loading) return <div className="space-y-4 p-6"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
 
   return (
     <div className="space-y-12">
