@@ -150,14 +150,14 @@ const [loading, setLoading] = useState(true);
 					)}
 					{upcoming.map((a) => (
 						<Card key={a.id}>
-							<CardContent className="p-4 flex justify-between items-center">
-								<div>
-									<p className="font-semibold">{a.serviceName}</p>
+							<CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+								<div className="min-w-0">
+									<p className="font-semibold break-words">{a.serviceName}</p>
 									<p className="text-sm text-[#6b6b6b]">
 										{a.date} {a.time}
 									</p>
 								</div>
-								<div className="flex items-center gap-2">
+								<div className="flex flex-wrap items-center gap-2">
 									<StatusBadge status={a.status} />
 									<Button
 										variant="outline"
