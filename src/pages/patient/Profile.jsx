@@ -29,6 +29,8 @@ export default function Profile() {
   const save = async (e) => {
     e.preventDefault();
     if (!user) return;
+    if (!form.fullName?.trim()) { toast.error("Full name is required"); return; }
+    if (form.phone && !/^[0-9+\-()\s]{6,}$/.test(form.phone)) { toast.error("Invalid phone number"); return; }
     setSaving(true);
     try {
       const data = { ...form };

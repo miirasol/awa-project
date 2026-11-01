@@ -27,16 +27,15 @@ export default function Appointments() {
   const [confirm, setConfirm] = useState(null);
   const [detailsAppt, setDetailsAppt] = useState(null);
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "appointments"), (snap) => {
+    const unsubAppts = onSnapshot(collection(db, "appointments"), (snap) => {
       setAppts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
-    (async () => {
-      const snap = await getDocs(collection(db, "users"));
+    const unsubUsers = onSnapshot(collection(db, "users"), (snap) => {
       const map = {};
       snap.docs.forEach((d) => { map[d.id] = d.data(); });
       setUsers(map);
-    })();
-    return unsub;
+    });
+    return () => { unsubAppts(); unsubUsers(); };
   }, []);
 
   const nameOf = (uid) => users[uid]?.fullName || uid;
@@ -148,6 +147,9 @@ export default function Appointments() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {filteredAll.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="text-center text-[#6b6b6b]">No appointments found.</TableCell></TableRow>
+              )}
               {filteredAll.map((a) => {
                 const past = a.startAt.toDate() < now;
                 return (

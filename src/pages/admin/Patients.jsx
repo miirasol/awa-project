@@ -48,6 +48,9 @@ export default function Patients() {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {filtered.length === 0 && (
+            <TableRow><TableCell colSpan={5} className="text-center text-[#6b6b6b]">No patients found.</TableCell></TableRow>
+          )}
           {filtered.map((p) => (
             <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/admin/patients/${p.id}`)}>
               <TableCell>{p.fullName}</TableCell>

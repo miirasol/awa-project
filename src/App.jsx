@@ -42,7 +42,7 @@ function PageTitle() {
 
 function GuestOnly({ children }) {
 	const { user, profile, loading } = useAuth();
-	if (loading) return null;
+	if (loading) return <div className="p-8"><div className="h-8 w-48 animate-pulse rounded bg-[#f0f0f0]" /></div>;
 	if (user) {
 		return (
 			<Navigate

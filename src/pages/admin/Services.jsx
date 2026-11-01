@@ -42,11 +42,14 @@ export default function Services() {
   };
 
   const save = async () => {
+    if (!form.name.trim()) { toast.error("Name is required"); return; }
+    if (!form.priceStart || !form.priceMax) { toast.error("Start and max price are required"); return; }
+    if (Number(form.priceStart) > Number(form.priceMax)) { toast.error("Max price must be at least start price"); return; }
     try {
       let imageUrl = form.imageUrl;
       if (file) imageUrl = await uploadImage(file);
       const priceRange = `${form.priceStart}-${form.priceMax}`;
-      const data = { name: form.name, description: form.description, priceRange, imageUrl, isActive: form.isActive };
+      const data = { name: form.name.trim(), description: form.description, priceRange, imageUrl, isActive: form.isActive };
       if (editing) {
         await updateDoc(doc(db, "services", editing.id), data);
       } else {

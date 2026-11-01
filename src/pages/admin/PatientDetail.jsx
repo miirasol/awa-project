@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +18,7 @@ import { statusLabel, formatDate, formatTime } from "@/lib/format";
 export default function PatientDetail() {
   const { uid } = useParams();
   const [patient, setPatient] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [appts, setAppts] = useState([]);
   const [records, setRecords] = useState([]);
   const [open, setOpen] = useState(false);
@@ -29,12 +31,14 @@ export default function PatientDetail() {
   const [existingUrls, setExistingUrls] = useState([]);
 
   const load = async () => {
+    setLoading(true);
     const p = await getDoc(doc(db, "users", uid));
-    if (p.exists()) setPatient(p.data());
+    if (p.exists()) setPatient({ id: p.id, ...p.data() });
     const a = await getDocs(query(collection(db, "appointments"), where("patientId", "==", uid)));
     setAppts(a.docs.map((d) => ({ id: d.id, ...d.data() })));
     const r = await getDocs(query(collection(db, "visitRecords"), where("patientId", "==", uid)));
     setRecords(r.docs.map((d) => ({ id: d.id, ...d.data() })).sort((x, y) => (y.createdAt?.seconds || 0) - (x.createdAt?.seconds || 0)));
+    setLoading(false);
   };
 
   useEffect(() => { load(); }, [uid]);
@@ -68,6 +72,7 @@ export default function PatientDetail() {
   };
 
   const save = async () => {
+    if (!procedure.trim()) { toast.error("Procedure is required"); return; }
     try {
       const urls = [...existingUrls];
       for (const f of files) urls.push(await uploadImage(f));
@@ -84,7 +89,8 @@ export default function PatientDetail() {
     } catch (e) { toast.error(e.message); }
   };
 
-  if (!patient) return null;
+  if (loading) return <Skeleton className="h-64 w-full" />;
+  if (!patient) return <p className="text-[#6b6b6b]">Patient not found.</p>;
 
   return (
     <div className="space-y-6">

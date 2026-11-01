@@ -107,6 +107,9 @@ export default function Book() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold">Choose a service</h1>
+        {services.length === 0 ? (
+          <p className="text-[#6b6b6b]">No services available right now.</p>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {services.map((s) => (
             <Card key={s.id}>
@@ -120,6 +123,7 @@ export default function Book() {
             </Card>
           ))}
         </div>
+        )}
       </div>
     );
   }
