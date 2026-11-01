@@ -36,17 +36,22 @@ export default function Book() {
 
   useEffect(() => {
     (async () => {
-      const s = await getDoc(doc(db, "settings", "clinic"));
-      if (s.exists()) setSettings(s.data());
-      const sv = await getDocs(collection(db, "services"));
-      const list = sv.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.isActive);
-      setServices(list);
-      const pre = searchParams.get("service");
-      if (pre) {
-        const found = list.find((x) => x.id === pre);
-        if (found) { setSelectedService(found); setStep(2); }
+      try {
+        const s = await getDoc(doc(db, "settings", "clinic"));
+        if (s.exists()) setSettings(s.data());
+        const sv = await getDocs(collection(db, "services"));
+        const list = sv.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.isActive);
+        setServices(list);
+        const pre = searchParams.get("service");
+        if (pre) {
+          const found = list.find((x) => x.id === pre);
+          if (found) { setSelectedService(found); setStep(2); }
+        }
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, []);
 
