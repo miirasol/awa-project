@@ -53,7 +53,7 @@ function Row({ a, name, phone, now, showDate, onDetails, onConfirm, onRun }) {
         {a.status === "cancel_requested" && (
           <>
             <Button size="sm" onClick={() => onConfirm({ fn: approveCancellation, appt: a, title: "Approve cancellation?" })}>Approve</Button>
-            <Button size="sm" variant="outline" onClick={() => onRun(rejectCancellation, a)}>Reject</Button>
+            <Button size="sm" variant="outline" onClick={() => onConfirm({ fn: rejectCancellation, appt: a, title: "Reject cancellation request?" })}>Reject</Button>
           </>
         )}
         {a.status === "confirmed" && past && (
@@ -263,6 +263,8 @@ export default function Appointments() {
                   ? "Mark this appointment as completed."
                   : confirm.fn === markNoShow
                   ? "Mark this appointment as no-show."
+                  : confirm.fn === rejectCancellation
+                  ? "Return this appointment to confirmed."
                   : "Confirm this action."}
               </p>
             </>
