@@ -16,7 +16,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: "", description: "", priceRange: "", imageUrl: "", isActive: true });
+  const [form, setForm] = useState({ name: "", description: "", priceStart: "", priceMax: "", imageUrl: "", isActive: true });
   const [file, setFile] = useState(null);
 
   const load = async () => {
@@ -28,14 +28,15 @@ export default function Services() {
 
   const openNew = () => {
     setEditing(null);
-    setForm({ name: "", description: "", priceRange: "", imageUrl: "", isActive: true });
+    setForm({ name: "", description: "", priceStart: "", priceMax: "", imageUrl: "", isActive: true });
     setFile(null);
     setOpen(true);
   };
 
   const openEdit = (s) => {
     setEditing(s);
-    setForm({ name: s.name, description: s.description, priceRange: s.priceRange, imageUrl: s.imageUrl || "", isActive: s.isActive });
+    const parts = String(s.priceRange || "").split("-").map((p) => p.trim()).filter(Boolean);
+    setForm({ name: s.name, description: s.description, priceStart: parts[0] || "", priceMax: parts[1] || parts[0] || "", imageUrl: s.imageUrl || "", isActive: s.isActive });
     setFile(null);
     setOpen(true);
   };
@@ -44,7 +45,8 @@ export default function Services() {
     try {
       let imageUrl = form.imageUrl;
       if (file) imageUrl = await uploadImage(file);
-      const data = { name: form.name, description: form.description, priceRange: form.priceRange, imageUrl, isActive: form.isActive };
+      const priceRange = `${form.priceStart}-${form.priceMax}`;
+      const data = { name: form.name, description: form.description, priceRange, imageUrl, isActive: form.isActive };
       if (editing) {
         await updateDoc(doc(db, "services", editing.id), data);
       } else {
@@ -92,7 +94,10 @@ export default function Services() {
           <div className="space-y-4">
             <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
             <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-            <div><Label>Price range</Label><Input value={form.priceRange} onChange={(e) => setForm({ ...form, priceRange: e.target.value })} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><Label>Start price</Label><Input type="number" value={form.priceStart} onChange={(e) => setForm({ ...form, priceStart: e.target.value })} /></div>
+              <div><Label>Max price</Label><Input type="number" value={form.priceMax} onChange={(e) => setForm({ ...form, priceMax: e.target.value })} /></div>
+            </div>
             <div><Label>Image</Label><Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} /></div>
             <div className="flex items-center gap-2">
               <Switch checked={form.isActive} onCheckedChange={(v) => setForm({ ...form, isActive: v })} />
