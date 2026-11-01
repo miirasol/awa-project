@@ -24,6 +24,25 @@ service cloud.firestore {
       return date + '_' + time.replace(':', '');
     }
 
+    // NEW: length limits (keep in sync with src/lib/limits.js)
+    function okStr(v, max) {
+      return v is string && v.size() <= max;
+    }
+
+    function validProfile(d) {
+      return okStr(d.get('fullName', ''), 60)
+        && okStr(d.get('email', ''), 254)
+        && okStr(d.get('phone', ''), 20)
+        && okStr(d.get('address', ''), 120);
+    }
+
+    function validClinicInfo(d) {
+      return okStr(d.get('clinicName', ''), 60)
+        && okStr(d.get('address', ''), 120)
+        && okStr(d.get('phone', ''), 20)
+        && okStr(d.get('email', ''), 254);
+    }
+
     // ---------- users ----------
     // Admin accounts are created by hand in the console (set role = 'admin').
 
@@ -32,11 +51,13 @@ service cloud.firestore {
 
       // Anyone registering can only make themselves a patient
       allow create: if isOwner(uid)
-        && request.resource.data.role == 'patient';
+        && request.resource.data.role == 'patient'
+        && validProfile(request.resource.data);
 
       // Users can edit their own profile but never change their role
       allow update: if (isOwner(uid)
-          && request.resource.data.role == resource.data.role)
+          && request.resource.data.role == resource.data.role
+          && validProfile(request.resource.data))
         || isAdmin();
 
       allow delete: if false;
@@ -46,12 +67,16 @@ service cloud.firestore {
 
     match /services/{serviceId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update: if isAdmin()
+        && okStr(request.resource.data.get('name', ''), 60);
+      allow delete: if isAdmin();
     }
 
     match /settings/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update: if isAdmin()
+        && validClinicInfo(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // ---------- slots (double-booking guard) ----------
@@ -93,6 +118,7 @@ service cloud.firestore {
         && request.resource.data.status == 'confirmed'
         && request.resource.data.startAt > request.time
         && request.resource.data.createdAt == request.time
+        && okStr(request.resource.data.reason, 500)
         && existsAfter(/databases/$(database)/documents/slots/$(slotIdFor(request.resource.data.date, request.resource.data.time)));
 
       allow update:
