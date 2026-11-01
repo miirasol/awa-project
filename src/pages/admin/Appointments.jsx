@@ -38,7 +38,7 @@ export default function Appointments() {
     return () => { unsubAppts(); unsubUsers(); };
   }, []);
 
-  const nameOf = (uid) => users[uid]?.fullName || uid;
+  const nameOf = (uid) => users[uid]?.fullName?.trim() || users[uid]?.email || "Unnamed patient";
   const phoneOf = (uid) => users[uid]?.phone || "";
 
   const now = new Date();
@@ -63,7 +63,7 @@ export default function Appointments() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Appointments</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] gap-4">
         <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Cancellation requests</p><p className="text-2xl font-semibold">{cancellationRequests.length}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Today's appointments</p><p className="text-2xl font-semibold">{todayAppts.length}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Upcoming confirmed</p><p className="text-2xl font-semibold">{upcomingConfirmed}</p></CardContent></Card>
@@ -77,13 +77,13 @@ export default function Appointments() {
         <TabsContent value="cancellations" className="space-y-3">
           {cancellationRequests.map((a) => (
             <Card key={a.id}>
-              <CardContent className="p-4 flex justify-between items-center">
-                <div>
+              <CardContent className="p-4 flex flex-col gap-3 lg:flex-row lg:justify-between lg:items-center">
+                <div className="min-w-0 break-words">
                   <p className="font-semibold"><Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link> · {phoneOf(a.patientId)}</p>
                   <p className="text-sm text-[#6b6b6b]">{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName}</p>
                   {a.reason && <p className="text-sm">Reason: {a.reason}</p>}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <Button size="sm" onClick={() => setConfirm({ fn: approveCancellation, appt: a })}>Approve</Button>
                   <Button size="sm" variant="outline" onClick={() => doAction(rejectCancellation, a)}>Reject</Button>
                 </div>
@@ -95,8 +95,8 @@ export default function Appointments() {
         <TabsContent value="today" className="space-y-3">
           {todayAppts.map((a) => (
             <Card key={a.id}>
-              <CardContent className="p-4 flex justify-between items-center">
-                <div>
+              <CardContent className="p-4 flex justify-between items-center gap-3">
+                <div className="min-w-0 break-words">
                   <p className="font-semibold">{formatTime(a.time)} · <Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></p>
                   <p className="text-sm text-[#6b6b6b]">{a.serviceName}</p>
                 </div>
@@ -106,15 +106,15 @@ export default function Appointments() {
           ))}
         </TabsContent>
         <TabsContent value="all" className="space-y-4">
-          <div className="flex flex-wrap items-end gap-3">
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap items-end gap-3">
             <div className="space-y-1">
               <label className="text-xs text-[#6b6b6b]">Search</label>
-              <Input placeholder="Search patient" value={search} onChange={(e) => setSearch(e.target.value)} className="w-64" />
+              <Input placeholder="Search patient" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:w-64" />
             </div>
             <div className="space-y-1">
               <label className="text-xs text-[#6b6b6b]">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48"><SelectValue>{statusFilter === "all" ? "All statuses" : statusLabel(statusFilter)}</SelectValue></SelectTrigger>
+                <SelectTrigger className="w-full sm:w-48"><SelectValue>{statusFilter === "all" ? "All statuses" : statusLabel(statusFilter)}</SelectValue></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All statuses</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
@@ -127,11 +127,11 @@ export default function Appointments() {
             </div>
             <div className="space-y-1">
               <label className="text-xs text-[#6b6b6b]">From</label>
-              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-44" />
+              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-full sm:w-44" />
             </div>
             <div className="space-y-1">
               <label className="text-xs text-[#6b6b6b]">To</label>
-              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-44" />
+              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-full sm:w-44" />
             </div>
           </div>
           <div className="overflow-x-auto">

@@ -9,7 +9,7 @@ export default function AppointmentDetailsDialog({ open, onOpenChange, appointme
       <DialogContent>
         <DialogHeader><DialogTitle>Appointment details</DialogTitle></DialogHeader>
         {a ? (
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-sm break-words">
             <p><span className="text-[#6b6b6b]">Date:</span> {formatDate(a.date)}</p>
             <p><span className="text-[#6b6b6b]">Time:</span> {formatTime(a.time)}</p>
             <p><span className="text-[#6b6b6b]">Service:</span> {a.serviceName}</p>

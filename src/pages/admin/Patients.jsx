@@ -35,7 +35,7 @@ export default function Patients() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Patients</h1>
-      <Input placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} className="w-64" />
+      <Input placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:w-64" />
       <div className="overflow-x-auto">
       <Table>
         <TableHeader>
@@ -53,9 +53,9 @@ export default function Patients() {
           )}
           {filtered.map((p) => (
             <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/admin/patients/${p.id}`)}>
-              <TableCell>{p.fullName}</TableCell>
+              <TableCell className="max-w-[14rem] truncate" title={p.fullName}>{p.fullName || "Unnamed patient"}</TableCell>
               <TableCell>{p.phone}</TableCell>
-              <TableCell>{p.email}</TableCell>
+              <TableCell className="max-w-[18rem] truncate" title={p.email}>{p.email}</TableCell>
               <TableCell>{visitsCount(p.id)}</TableCell>
               <TableCell>{lastVisit(p.id)}</TableCell>
             </TableRow>

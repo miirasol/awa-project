@@ -9,6 +9,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { seedSampleData } from "@/lib/seed";
 import { toDateString as toDateStr } from "@/lib/dates";
+import { LIMITS, tooLong } from "@/lib/limits";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -57,9 +58,11 @@ export default function Settings() {
   };
 
   const saveInfo = async () => {
+    if (tooLong(form.clinicName, LIMITS.clinicName)) { toast.error(`Clinic name must be ${LIMITS.clinicName} characters or fewer`); return; }
+    if (tooLong(form.address, LIMITS.address)) { toast.error(`Address must be ${LIMITS.address} characters or fewer`); return; }
     try {
       await setDoc(doc(db, "settings", "clinic"), {
-        clinicName: form.clinicName, address: form.address, phone: form.phone, email: form.email,
+        clinicName: form.clinicName.trim(), address: form.address.trim(), phone: form.phone.trim(), email: form.email.trim(),
       }, { merge: true });
       toast.success("Saved");
     } catch (e) { toast.error(e.message); }
@@ -108,7 +111,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
       <Card>
         <CardHeader><CardTitle>Schedule</CardTitle></CardHeader>
@@ -144,10 +147,10 @@ export default function Settings() {
       <Card>
         <CardHeader><CardTitle>Closed dates</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-2 items-end">
-            <div className="w-full"><Label>From</Label><Input type="date" className="w-full" value={newClosed} onChange={(e) => setNewClosed(e.target.value)} /></div>
-            <div className="w-full"><Label>To</Label><Input type="date" className="w-full" value={newClosedEnd} onChange={(e) => setNewClosedEnd(e.target.value)} /></div>
-            <Button onClick={addClosed}>Add</Button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_auto] gap-2 items-end">
+            <div className="min-w-0"><Label>From</Label><Input type="date" className="w-full" value={newClosed} onChange={(e) => setNewClosed(e.target.value)} /></div>
+            <div className="min-w-0"><Label>To</Label><Input type="date" className="w-full" value={newClosedEnd} onChange={(e) => setNewClosedEnd(e.target.value)} /></div>
+            <Button className="w-full sm:col-span-2 xl:col-span-1 xl:w-auto" onClick={addClosed}>Add date</Button>
           </div>
           <p className="text-xs text-[#6b6b6b]">Leave end date empty for a single day.</p>
           <ul className="space-y-1">
@@ -163,10 +166,10 @@ export default function Settings() {
       <Card>
         <CardHeader><CardTitle>Clinic info</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div><Label>Clinic name</Label><Input value={form.clinicName} onChange={(e) => setForm({ ...form, clinicName: e.target.value })} /></div>
-          <div><Label>Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-          <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-          <div><Label>Email</Label><Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div><Label>Clinic name</Label><Input value={form.clinicName} maxLength={LIMITS.clinicName} onChange={(e) => setForm({ ...form, clinicName: e.target.value })} /></div>
+          <div><Label>Address</Label><Input value={form.address} maxLength={LIMITS.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+          <div><Label>Phone</Label><Input value={form.phone} maxLength={LIMITS.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+          <div><Label>Email</Label><Input value={form.email} maxLength={LIMITS.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
           <Button onClick={saveInfo}>Save info</Button>
         </CardContent>
       </Card>

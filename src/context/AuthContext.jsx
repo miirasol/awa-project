@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  deleteUser,
   sendPasswordResetEmail,
   setPersistence,
   browserLocalPersistence,
@@ -12,6 +13,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/lib/firebase";
+import { LIMITS } from "@/lib/limits";
 
 const AuthContext = createContext(null);
 
@@ -21,6 +23,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const profileUnsubRef = useRef(null);
   const creatingRef = useRef(new Set());
+  const registeringRef = useRef(false);
 
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
@@ -44,6 +47,8 @@ export function AuthProvider({ children }) {
             setLoading(false);
             return;
           }
+          // register() writes the full profile itself; don't race it with a blank fallback doc
+          if (registeringRef.current) return;
           if (!creatingRef.current.has(u.uid)) {
             creatingRef.current.add(u.uid);
             try {
@@ -52,7 +57,7 @@ export function AuthProvider({ children }) {
                 {
                   email: u.email || "",
                   role: "patient",
-                  fullName: u.displayName || "",
+                  fullName: (u.displayName || "").slice(0, LIMITS.personName),
                   phone: "",
                   createdAt: serverTimestamp(),
                 },
@@ -84,15 +89,26 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (email, password, fullName, phone) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await setDoc(doc(db, "users", cred.user.uid), {
-      email,
-      role: "patient",
-      fullName,
-      phone,
-      createdAt: serverTimestamp(),
-    });
-    return cred;
+    registeringRef.current = true;
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      try {
+        await setDoc(doc(db, "users", cred.user.uid), {
+          email,
+          role: "patient",
+          fullName,
+          phone,
+          createdAt: serverTimestamp(),
+        });
+      } catch (err) {
+        // Profile write failed: remove the auth account so we never keep a login with no/blank profile
+        try { await deleteUser(cred.user); } catch (e) { console.error(e); await signOut(auth); }
+        throw err;
+      }
+      return cred;
+    } finally {
+      registeringRef.current = false;
+    }
   };
 
   const googleSignIn = async () => {
@@ -103,7 +119,7 @@ export function AuthProvider({ children }) {
       await setDoc(ref, {
         email: cred.user.email || "",
         role: "patient",
-        fullName: cred.user.displayName || "",
+        fullName: (cred.user.displayName || "").slice(0, LIMITS.personName),
         phone: "",
         createdAt: serverTimestamp(),
       }, { merge: true });

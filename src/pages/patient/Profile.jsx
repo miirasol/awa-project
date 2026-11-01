@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { LIMITS, tooLong } from "@/lib/limits";
 
 export default function Profile() {
   const { user, profile } = useAuth();
@@ -30,10 +31,12 @@ export default function Profile() {
     e.preventDefault();
     if (!user) return;
     if (!form.fullName?.trim()) { toast.error("Full name is required"); return; }
+    if (tooLong(form.fullName, LIMITS.personName)) { toast.error(`Name must be ${LIMITS.personName} characters or fewer`); return; }
+    if (tooLong(form.address, LIMITS.address)) { toast.error(`Address must be ${LIMITS.address} characters or fewer`); return; }
     if (form.phone && !/^[0-9+\-()\s]{6,}$/.test(form.phone)) { toast.error("Invalid phone number"); return; }
     setSaving(true);
     try {
-      const data = { ...form };
+      const data = { ...form, fullName: form.fullName.trim(), address: form.address.trim(), phone: form.phone.trim() };
       if (avatarFile) data.avatarUrl = await uploadImage(avatarFile);
       await updateDoc(doc(db, "users", user.uid), data);
       toast.success("Saved");
@@ -52,11 +55,11 @@ export default function Profile() {
               <Input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files[0])} />
               {profile?.avatarUrl && <img src={profile.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full mt-2" />}
             </div>
-            <div><Label>Full name</Label><Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} /></div>
-            <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            <div><Label>Full name</Label><Input value={form.fullName} maxLength={LIMITS.personName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} /></div>
+            <div><Label>Phone</Label><Input value={form.phone} maxLength={LIMITS.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
             <div><Label>Birthdate</Label><Input type="date" value={form.birthdate} onChange={(e) => setForm({ ...form, birthdate: e.target.value })} /></div>
-            <div><Label>Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-            <div><Label>Email</Label><Input value={profile?.email || ""} readOnly /></div>
+            <div><Label>Address</Label><Input value={form.address} maxLength={LIMITS.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+            <div><Label>Email</Label><Input value={profile?.email || ""} readOnly className="truncate" title={profile?.email || ""} /></div>
             <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
           </form>
         </CardContent>

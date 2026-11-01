@@ -120,9 +120,9 @@ export default function Dashboard() {
             const dateStr = a ? fmt(a.startAt.toDate()) : (r?.date || "");
             return (
             <Card key={item.kind === "appt" ? a.id : r.id}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold">{label}</p>
+              <CardContent className="p-4 break-words">
+                <div className="flex justify-between items-center gap-2">
+                  <p className="font-semibold min-w-0">{label}</p>
                   <Badge variant="outline">Completed</Badge>
                 </div>
                 <p className="text-sm text-[#6b6b6b]">{dateStr}</p>

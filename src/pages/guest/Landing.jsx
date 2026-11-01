@@ -59,16 +59,16 @@ export default function Landing() {
         <h2 className="text-2xl font-semibold mb-4">Services</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((s) => (
-            <Card key={s.id} className="rounded-xl border">
-              <CardContent className="p-3">
+            <Card key={s.id} className="rounded-xl border h-full">
+              <CardContent className="p-3 flex flex-1 flex-col">
                 {s.imageUrl ? (
                   <img src={s.imageUrl} alt={s.name} className="w-full h-52 object-cover rounded-lg mb-2" />
                 ) : (
                   <div className="w-full h-52 rounded-lg border border-dashed bg-[#fafafa] mb-2" />
                 )}
-                <h3 className="font-medium">{s.name}</h3>
-                <p className="text-sm text-[#6b6b6b]">{s.description}</p>
-                <div className="border-t border-[#e5e5e5] my-3" />
+                <h3 className="font-medium break-words">{s.name}</h3>
+                <p className="text-sm text-[#6b6b6b] break-words">{s.description}</p>
+                <div className="border-t border-[#e5e5e5] my-3 mt-auto" />
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-sm">{formatPrice(s.priceRange)}</span>
                   <Button variant="outline" size="sm" render={<Link to={`/book?service=${s.id}`} />}>
@@ -123,15 +123,15 @@ export default function Landing() {
       <footer id="contact" className="w-full bg-[#f9f9f9] border-t border-[#e5e5e5] scroll-mt-20">
         <div className={container + " py-8"}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold">Clinic Appointment System</p>
-              <p className="text-sm text-[#6b6b6b] mt-2">{settings?.clinicName}</p>
+              <p className="text-sm text-[#6b6b6b] mt-2 break-words">{settings?.clinicName}</p>
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold mb-2">Contact</p>
-              <p className="text-sm text-[#6b6b6b]">{settings?.address}</p>
-              <p className="text-sm text-[#6b6b6b]">{settings?.phone}</p>
-              <p className="text-sm text-[#6b6b6b]">{settings?.email}</p>
+              <p className="text-sm text-[#6b6b6b] break-words">{settings?.address}</p>
+              <p className="text-sm text-[#6b6b6b] break-words">{settings?.phone}</p>
+              <p className="text-sm text-[#6b6b6b] break-all">{settings?.email}</p>
             </div>
             <div>
               <p className="text-sm font-semibold mb-2">Clinic hours</p>

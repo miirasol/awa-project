@@ -11,6 +11,7 @@ import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp } from "fi
 import { db } from "@/lib/firebase";
 import { uploadImage } from "@/lib/cloudinary";
 import { formatPrice } from "@/lib/format";
+import { LIMITS, tooLong } from "@/lib/limits";
 
 export default function Services() {
   const [services, setServices] = useState([]);
@@ -43,6 +44,7 @@ export default function Services() {
 
   const save = async () => {
     if (!form.name.trim()) { toast.error("Name is required"); return; }
+    if (tooLong(form.name, LIMITS.serviceName)) { toast.error(`Name must be ${LIMITS.serviceName} characters or fewer`); return; }
     if (!form.priceStart || !form.priceMax) { toast.error("Start and max price are required"); return; }
     if (Number(form.priceStart) > Number(form.priceMax)) { toast.error("Max price must be at least start price"); return; }
     try {
@@ -67,25 +69,25 @@ export default function Services() {
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center gap-4">
         <h1 className="text-2xl font-semibold">Services</h1>
         <Button onClick={openNew}>Add service</Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {services.map((s) => (
-          <Card key={s.id}>
-            <CardContent className="p-4 space-y-2">
+          <Card key={s.id} className="h-full">
+            <CardContent className="p-4 flex flex-1 flex-col gap-2">
               {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
-              <h3 className="font-semibold">{s.name}</h3>
-              <p className="text-sm text-muted-foreground">{s.description}</p>
+              <h3 className="font-semibold break-words">{s.name}</h3>
+              <p className="text-sm text-muted-foreground break-words">{s.description}</p>
               <p className="text-sm">{formatPrice(s.priceRange)}</p>
-              <div className="flex items-center justify-between">
+              <div className="mt-auto pt-2 flex flex-col gap-3">
+                <Button variant="outline" size="sm" className="w-full" onClick={() => openEdit(s)}>Edit</Button>
                 <div className="flex items-center gap-2">
                   <Switch checked={s.isActive} onCheckedChange={() => toggleActive(s)} />
                   <span className="text-sm">{s.isActive ? "Active" : "Inactive"}</span>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => openEdit(s)}>Edit</Button>
               </div>
             </CardContent>
           </Card>
@@ -95,7 +97,7 @@ export default function Services() {
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? "Edit service" : "Add service"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+            <div><Label>Name</Label><Input value={form.name} maxLength={LIMITS.serviceName} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
             <div><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Start price</Label><Input type="number" value={form.priceStart} onChange={(e) => setForm({ ...form, priceStart: e.target.value })} /></div>
