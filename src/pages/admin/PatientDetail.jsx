@@ -97,9 +97,9 @@ export default function PatientDetail() {
       <Card>
         <CardContent className="p-4 flex items-center gap-4">
           {patient.avatarUrl && <img src={patient.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />}
-          <div>
-            <h1 className="text-2xl font-semibold">{patient.fullName}</h1>
-            <p className="text-sm text-[#6b6b6b]">{patient.email} · {patient.phone}</p>
+          <div className="min-w-0 break-words">
+            <h1 className="text-2xl font-semibold">{patient.fullName || "Unnamed patient"}</h1>
+            <p className="text-sm text-[#6b6b6b] break-all">{patient.email} · {patient.phone}</p>
             <p className="text-sm text-[#6b6b6b]">{patient.birthdate} · {patient.address}</p>
           </div>
         </CardContent>
@@ -113,7 +113,7 @@ export default function PatientDetail() {
           <div className="space-y-2">
             {appts.map((a) => (
               <Card key={a.id}><CardContent className="p-3 flex justify-between items-center">
-                <span>{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}</span>
+                <span className="min-w-0 break-words">{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}</span>
                 <Button size="sm" variant="outline" onClick={() => setDetailsAppt(a)}>Details</Button>
               </CardContent></Card>
             ))}
@@ -122,7 +122,7 @@ export default function PatientDetail() {
           <Button onClick={openNew}>Add visit record</Button>
           {records.map((r) => (
             <Card key={r.id}>
-              <CardContent className="p-4 space-y-1">
+              <CardContent className="p-4 space-y-1 break-words">
                 <p className="font-semibold">{r.procedure}</p>
                 <p className="text-sm text-[#6b6b6b]">{r.date}</p>
                 {r.notes && <p className="text-sm">{r.notes}</p>}

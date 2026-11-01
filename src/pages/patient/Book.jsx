@@ -15,9 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LIMITS } from "@/lib/limits";
 
 export default function Book() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
@@ -79,7 +80,13 @@ export default function Book() {
     return false;
   };
 
+  const profileIncomplete = !!profile && !profile.fullName?.trim();
+
   const doBook = async () => {
+    if (profileIncomplete) {
+      toast.error("Please add your full name in Profile settings before booking.");
+      return;
+    }
     if (await cap()) return;
     setBooking(true);
     try {
@@ -103,6 +110,16 @@ export default function Book() {
 
   if (loading) return <Skeleton className="h-64 w-full" />;
 
+  if (profileIncomplete) {
+    return (
+      <Card><CardContent className="p-6 text-center space-y-3">
+        <h1 className="text-xl font-semibold">Complete your profile first</h1>
+        <p className="text-sm text-[#6b6b6b]">We need your full name before you can book an appointment.</p>
+        <Button onClick={() => navigate("/profile")}>Go to Profile settings</Button>
+      </CardContent></Card>
+    );
+  }
+
   if (step === 1) {
     return (
       <div className="space-y-6">
@@ -110,15 +127,17 @@ export default function Book() {
         {services.length === 0 ? (
           <p className="text-[#6b6b6b]">No services available right now.</p>
         ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {services.map((s) => (
-            <Card key={s.id}>
-              <CardContent className="p-4 space-y-2">
+            <Card key={s.id} className="h-full">
+              <CardContent className="p-4 flex flex-1 flex-col gap-2">
                 {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
-                <h3 className="font-semibold">{s.name}</h3>
-                <p className="text-sm text-[#6b6b6b]">{s.description}</p>
+                <h3 className="font-semibold break-words">{s.name}</h3>
+                <p className="text-sm text-[#6b6b6b] break-words">{s.description}</p>
                 <p className="text-sm">{formatPrice(s.priceRange)}</p>
-                <Button onClick={() => { setSelectedService(s); setSelectedSlot(null); setDate(null); setStep(2); }}>Select</Button>
+                <div className="mt-auto pt-2">
+                  <Button className="w-full" onClick={() => { setSelectedService(s); setSelectedSlot(null); setDate(null); setStep(2); }}>Select</Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -195,15 +214,15 @@ export default function Book() {
         <h1 className="text-2xl font-semibold">Confirm</h1>
         <Card>
           <CardContent className="p-4 space-y-2">
-            <p><strong>Service:</strong> {selectedService?.name}</p>
+            <p className="break-words"><strong>Service:</strong> {selectedService?.name}</p>
             <p><strong>Date:</strong> {toDateString(date)}</p>
             <p><strong>Time:</strong> {selectedSlot}</p>
-            <p><strong>Location:</strong> {settings?.address}</p>
+            <p className="break-words"><strong>Location:</strong> {settings?.address}</p>
           </CardContent>
         </Card>
         <div>
           <Label>Reason for visit</Label>
-          <Textarea value={reason} onChange={(e) => setReason(e.target.value)} />
+          <Textarea value={reason} maxLength={LIMITS.reason} onChange={(e) => setReason(e.target.value)} />
         </div>
         <div>
           <Label>Photo (optional)</Label>
