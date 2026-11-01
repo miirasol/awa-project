@@ -13,4 +13,15 @@ export default defineConfig({
 		environment: "jsdom",
 		globals: true,
 	},
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router")) return "react";
+					if (id.includes("node_modules/firebase")) return "firebase";
+					return undefined;
+				},
+			},
+		},
+	},
 });
