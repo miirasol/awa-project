@@ -48,23 +48,49 @@ export default function Landing() {
   const container = "mx-auto w-full max-w-[1140px] px-6";
 
   if (loading) return (
-    <div className="space-y-12 p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i} className="rounded-xl border h-full">
-            <CardContent className="p-3 space-y-2">
-              <Skeleton className="w-full h-52 rounded-lg" />
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-20 w-full rounded-xl" />
-        ))}
-      </div>
+    <div className="space-y-12">
+      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <div className="mt-6 flex gap-3">
+              <Skeleton className="h-10 w-40" />
+              <Skeleton className="h-10 w-36" />
+            </div>
+          </div>
+          <Skeleton className="hidden md:block w-full max-w-[580px] rounded-xl" style={{ aspectRatio: "16/10" }} />
+        </div>
+      </section>
+      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+        <Skeleton className="h-8 w-32 mb-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="rounded-xl border h-full">
+              <CardContent className="p-3 space-y-2">
+                <Skeleton className="w-full h-52 rounded-lg" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+        <Skeleton className="h-8 w-32 mb-4" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+          ))}
+        </div>
+      </section>
     </div>
   );
 
