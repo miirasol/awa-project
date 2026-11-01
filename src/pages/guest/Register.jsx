@@ -62,7 +62,7 @@ export default function Register() {
           <div className="my-4 text-center text-sm text-muted-foreground">or</div>
           <Button variant="outline" onClick={google} disabled={loading} className="w-full">Continue with Google</Button>
           <p className="mt-4 text-sm text-center">
-            Already have an account? <Link to="/login" className="text-blue-600">Log in</Link>
+            Already have an account? <Link to="/login" className="text-[#0a0a0a] underline">Log in</Link>
           </p>
         </CardContent>
       </Card>

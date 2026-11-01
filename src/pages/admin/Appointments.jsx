@@ -5,6 +5,7 @@ import { collection, onSnapshot, query, where, getDocs, doc, getDoc } from "fire
 import { db } from "@/lib/firebase";
 import { approveCancellation, rejectCancellation, markCompleted, markNoShow, cancelAppointment } from "@/lib/appointments";
 import { slotId, toDateString } from "@/lib/dates";
+import { statusLabel, formatDate, formatTime } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-
+import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 export default function Appointments() {
   const [appts, setAppts] = useState([]);
   const [users, setUsers] = useState({});
@@ -24,7 +25,7 @@ export default function Appointments() {
   const [dateTo, setDateTo] = useState("");
   const [search, setSearch] = useState("");
   const [confirm, setConfirm] = useState(null);
-
+  const [detailsAppt, setDetailsAppt] = useState(null);
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "appointments"), (snap) => {
       setAppts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -62,11 +63,11 @@ export default function Appointments() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Appointments</h1>
+      <h1 className="text-2xl font-semibold">Appointments</h1>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card><CardContent className="p-4"><p className="text-xs text-[#737373] break-words">Cancellation requests</p><p className="text-2xl font-bold">{cancellationRequests.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-[#737373] break-words">Today's appointments</p><p className="text-2xl font-bold">{todayAppts.length}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-[#737373] break-words">Upcoming confirmed</p><p className="text-2xl font-bold">{upcomingConfirmed}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Cancellation requests</p><p className="text-2xl font-semibold">{cancellationRequests.length}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Today's appointments</p><p className="text-2xl font-semibold">{todayAppts.length}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-[#6b6b6b] break-words">Upcoming confirmed</p><p className="text-2xl font-semibold">{upcomingConfirmed}</p></CardContent></Card>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
@@ -80,7 +81,7 @@ export default function Appointments() {
               <CardContent className="p-4 flex justify-between items-center">
                 <div>
                   <p className="font-semibold"><Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link> · {phoneOf(a.patientId)}</p>
-                  <p className="text-sm text-[#737373]">{a.date} {a.time} · {a.serviceName}</p>
+                  <p className="text-sm text-[#6b6b6b]">{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName}</p>
                   {a.reason && <p className="text-sm">Reason: {a.reason}</p>}
                 </div>
                 <div className="flex gap-2">
@@ -90,37 +91,49 @@ export default function Appointments() {
               </CardContent>
             </Card>
           ))}
-          {cancellationRequests.length === 0 && <p className="text-[#737373]">No cancellation requests.</p>}
+          {cancellationRequests.length === 0 && <p className="text-[#6b6b6b]">No cancellation requests.</p>}
         </TabsContent>
         <TabsContent value="today" className="space-y-3">
           {todayAppts.map((a) => (
             <Card key={a.id}>
               <CardContent className="p-4 flex justify-between items-center">
                 <div>
-                  <p className="font-semibold">{a.time} · <Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></p>
-                  <p className="text-sm text-[#737373]">{a.serviceName}</p>
+                  <p className="font-semibold">{formatTime(a.time)} · <Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></p>
+                  <p className="text-sm text-[#6b6b6b]">{a.serviceName}</p>
                 </div>
-                <Badge>{a.status}</Badge>
+                <Badge>{statusLabel(a.status)}</Badge>
               </CardContent>
             </Card>
           ))}
         </TabsContent>
         <TabsContent value="all" className="space-y-4">
-          <div className="flex gap-3 flex-wrap">
-            <Input placeholder="Search patient" value={search} onChange={(e) => setSearch(e.target.value)} className="w-48" />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="cancel_requested">Cancel requested</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="no_show">No show</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <label className="text-xs text-[#6b6b6b]">Search</label>
+              <Input placeholder="Search patient" value={search} onChange={(e) => setSearch(e.target.value)} className="w-64" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-[#6b6b6b]">Status</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-48"><SelectValue>{statusFilter === "all" ? "All statuses" : statusLabel(statusFilter)}</SelectValue></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="cancel_requested">Cancel requested</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="no_show">No show</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-[#6b6b6b]">From</label>
+              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-44" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-[#6b6b6b]">To</label>
+              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-44" />
+            </div>
           </div>
           <div className="overflow-x-auto">
           <Table>
@@ -139,13 +152,13 @@ export default function Appointments() {
                 const past = a.startAt.toDate() < now;
                 return (
                   <TableRow key={a.id}>
-                    <TableCell>{a.date}</TableCell>
-                    <TableCell>{a.time}</TableCell>
+                    <TableCell>{formatDate(a.date)}</TableCell>
+                    <TableCell>{formatTime(a.time)}</TableCell>
                     <TableCell><Link to={`/admin/patients/${a.patientId}`}>{nameOf(a.patientId)}</Link></TableCell>
                     <TableCell>{a.serviceName}</TableCell>
-                    <TableCell><Badge variant="outline">{a.status}</Badge></TableCell>
+                    <TableCell><Badge variant="outline">{statusLabel(a.status)}</Badge></TableCell>
                     <TableCell className="space-x-2">
-                      {a.status === "confirmed" && past && (
+                      <Button size="sm" variant="outline" onClick={() => setDetailsAppt(a)}>Details</Button>                      {a.status === "confirmed" && past && (
                         <>
                           <Button size="sm" onClick={() => doAction(markCompleted, a)}>Complete</Button>
                           <Button size="sm" variant="outline" onClick={() => doAction(markNoShow, a)}>No-show</Button>
@@ -163,8 +176,8 @@ export default function Appointments() {
           </div>
         </TabsContent>
       </Tabs>
-      <Dialog open={!!confirm} onOpenChange={() => setConfirm(null)}>
-        <DialogContent>
+      <AppointmentDetailsDialog open={!!detailsAppt} onOpenChange={() => setDetailsAppt(null)} appointment={detailsAppt} patientName={detailsAppt ? nameOf(detailsAppt.patientId) : ""} />
+      <Dialog open={!!confirm} onOpenChange={() => setConfirm(null)}>        <DialogContent>
           <DialogHeader><DialogTitle>Confirm action</DialogTitle></DialogHeader>
           <p>Are you sure?</p>
           <DialogFooter>

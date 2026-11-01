@@ -34,7 +34,7 @@ export default function Patients() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Patients</h1>
+      <h1 className="text-2xl font-semibold">Patients</h1>
       <Input placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} className="w-64" />
       <div className="overflow-x-auto">
       <Table>

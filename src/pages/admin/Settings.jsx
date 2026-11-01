@@ -14,7 +14,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Settings() {
   const [form, setForm] = useState({
-    clinicName: "", address: "", phone: "", email: "",
+    clinicName: "", address: "", phone: "", email: "", aboutText: "",
     openDays: [], openTime: "09:00", closeTime: "17:00",
     breakStart: "", breakEnd: "", closedDates: [], slotMinutes: 30,
   });
@@ -39,6 +39,7 @@ export default function Settings() {
     try {
       await setDoc(doc(db, "settings", "clinic"), {
         clinicName: form.clinicName, address: form.address, phone: form.phone, email: form.email,
+        aboutText: form.aboutText,
       }, { merge: true });
       toast.success("Saved");
     } catch (e) { toast.error(e.message); }
@@ -83,7 +84,7 @@ export default function Settings() {
 
   return (
     <div className="p-8 space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-2xl font-semibold">Settings</h1>
       <Card>
         <CardHeader><CardTitle>Schedule</CardTitle></CardHeader>
         <CardContent className="space-y-4">
@@ -113,7 +114,7 @@ export default function Settings() {
             <div className="w-full"><Label>To</Label><Input type="date" className="w-full" value={newClosedEnd} onChange={(e) => setNewClosedEnd(e.target.value)} /></div>
             <Button onClick={addClosed}>Add</Button>
           </div>
-          <p className="text-xs text-[#737373]">Leave end date empty for a single day.</p>
+          <p className="text-xs text-[#6b6b6b]">Leave end date empty for a single day.</p>
           <ul className="space-y-1">
             {(form.closedDates || []).map((d) => (
               <li key={d} className="flex justify-between">
@@ -131,6 +132,7 @@ export default function Settings() {
           <div><Label>Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div><Label>Email</Label><Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div><Label>About text</Label><Input value={form.aboutText || ""} onChange={(e) => setForm({ ...form, aboutText: e.target.value })} /></div>
           <Button onClick={saveInfo}>Save info</Button>
         </CardContent>
       </Card>

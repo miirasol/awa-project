@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { statusLabel, formatDate, formatTime } from "@/lib/format";
 
 export default function PatientDetail() {
   const { uid } = useParams();
@@ -19,7 +20,7 @@ export default function PatientDetail() {
   const [appts, setAppts] = useState([]);
   const [records, setRecords] = useState([]);
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
+  const [detailsAppt, setDetailsAppt] = useState(null);  const [editing, setEditing] = useState(null);
   const [selectedAppt, setSelectedAppt] = useState("");
   const [procedure, setProcedure] = useState("");
   const [notes, setNotes] = useState("");
@@ -91,9 +92,9 @@ export default function PatientDetail() {
         <CardContent className="p-4 flex items-center gap-4">
           {patient.avatarUrl && <img src={patient.avatarUrl} alt="" className="w-16 h-16 rounded-full object-cover" />}
           <div>
-            <h1 className="text-2xl font-bold">{patient.fullName}</h1>
-            <p className="text-sm text-[#737373]">{patient.email} · {patient.phone}</p>
-            <p className="text-sm text-[#737373]">{patient.birthdate} · {patient.address}</p>
+            <h1 className="text-2xl font-semibold">{patient.fullName}</h1>
+            <p className="text-sm text-[#6b6b6b]">{patient.email} · {patient.phone}</p>
+            <p className="text-sm text-[#6b6b6b]">{patient.birthdate} · {patient.address}</p>
           </div>
         </CardContent>
       </Card>
@@ -105,23 +106,24 @@ export default function PatientDetail() {
         <TabsContent value="appointments">
           <div className="space-y-2">
             {appts.map((a) => (
-              <Card key={a.id}><CardContent className="p-3">{a.date} {a.time} · {a.serviceName} · {a.status}</CardContent></Card>
+              <Card key={a.id}><CardContent className="p-3 flex justify-between items-center">
+                <span>{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}</span>
+                <Button size="sm" variant="outline" onClick={() => setDetailsAppt(a)}>Details</Button>
+              </CardContent></Card>
             ))}
-          </div>
-        </TabsContent>
+          </div>        </TabsContent>
         <TabsContent value="records" className="space-y-3">
           <Button onClick={openNew}>Add visit record</Button>
           {records.map((r) => (
             <Card key={r.id}>
               <CardContent className="p-4 space-y-1">
                 <p className="font-semibold">{r.procedure}</p>
-                <p className="text-sm text-[#737373]">{r.date}</p>
+                <p className="text-sm text-[#6b6b6b]">{r.date}</p>
                 {r.notes && <p className="text-sm">{r.notes}</p>}
-                {r.nextVisitSuggestion && <p className="text-sm text-[#737373]">Next: {r.nextVisitSuggestion}</p>}
+                {r.nextVisitSuggestion && <p className="text-sm text-[#6b6b6b]">Next: {r.nextVisitSuggestion}</p>}
                 {r.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt="" className="w-16 h-16 object-cover rounded" />)}
-                  </div>
+                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt="" className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}                  </div>
                 )}
                 <Button size="sm" variant="outline" onClick={() => openEdit(r)}>Edit</Button>
               </CardContent>
@@ -138,7 +140,7 @@ export default function PatientDetail() {
                 <Label>Appointment</Label>
                 <select className="border rounded p-2 w-full" value={selectedAppt} onChange={(e) => setSelectedAppt(e.target.value)}>
                   {completedWithoutRecord.map((a) => (
-                    <option key={a.id} value={a.id}>{a.date} {a.time} · {a.serviceName}</option>
+                    <option key={a.id} value={a.id}>{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName}</option>
                   ))}
                 </select>
               </div>
@@ -158,6 +160,7 @@ export default function PatientDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AppointmentDetailsDialog open={!!detailsAppt} onOpenChange={() => setDetailsAppt(null)} appointment={detailsAppt} />
     </div>
   );
 }

@@ -41,7 +41,7 @@ export default function Profile() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="text-2xl font-bold mb-4">Profile settings</h1>
+      <h1 className="text-2xl font-semibold mb-4">Profile settings</h1>
       <Card>
         <CardContent className="p-6">
           <form onSubmit={save} className="space-y-4">

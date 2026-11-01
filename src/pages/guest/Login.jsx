@@ -83,7 +83,7 @@ export default function Login() {
               <span className="text-sm">Remember me</span>
             </div>
             <Button type="submit" disabled={loading} className="w-full">Log In</Button>
-            <button type="button" onClick={forgot} className="text-sm text-blue-600">Forgot password?</button>
+            <button type="button" onClick={forgot} className="text-sm text-[#0a0a0a] underline">Forgot password?</button>
           </form>
           <div className="my-4 text-center text-sm text-muted-foreground">or</div>
           <Button variant="outline" onClick={google} disabled={loading} className="w-full">Continue with Google</Button>

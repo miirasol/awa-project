@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { generateSlots, toDateString, slotId } from "@/lib/slots";
 import { bookAppointment, countUpcomingConfirmed } from "@/lib/appointments";
 import { uploadImage } from "@/lib/cloudinary";
+import { formatPrice } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,15 +106,15 @@ export default function Book() {
   if (step === 1) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Choose a service</h1>
+        <h1 className="text-2xl font-semibold">Choose a service</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {services.map((s) => (
             <Card key={s.id}>
               <CardContent className="p-4 space-y-2">
                 {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
                 <h3 className="font-semibold">{s.name}</h3>
-                <p className="text-sm text-[#737373]">{s.description}</p>
-                <p className="text-sm">₱{s.priceRange.replace("-", " - ₱")}</p>
+                <p className="text-sm text-[#6b6b6b]">{s.description}</p>
+                <p className="text-sm">{formatPrice(s.priceRange)}</p>
                 <Button onClick={() => { setSelectedService(s); setSelectedSlot(null); setDate(null); setStep(2); }}>Select</Button>
               </CardContent>
             </Card>
@@ -148,15 +149,15 @@ export default function Book() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Pick a date and time</h1>
+          <h1 className="text-2xl font-semibold">Pick a date and time</h1>
           <Button variant="outline" onClick={() => { setStep(1); setSelectedSlot(null); setDate(null); }}>Change service</Button>
         </div>
-        <p className="text-sm text-[#737373]">Booking: {selectedService?.name}</p>
+        <p className="text-sm text-[#6b6b6b]">Booking: {selectedService?.name}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardContent className="p-4">
               <Calendar mode="single" selected={date} onSelect={setDate} disabled={disabledDay} className="w-full" />
-              <p className="text-xs text-[#737373] mt-2">
+              <p className="text-xs text-[#6b6b6b] mt-2">
                 Closed days: {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].filter((_, i) => !settings.openDays.includes(i)).join(", ")}
               </p>
             </CardContent>
@@ -165,11 +166,11 @@ export default function Book() {
             {date && (
               <>
                 <div>
-                  <p className="text-xs uppercase text-[#525252] mb-2">Morning</p>
+                  <p className="text-xs uppercase text-[#6b6b6b] mb-2">Morning</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{morning.map(renderSlot)}</div>
                 </div>
                 <div>
-                  <p className="text-xs uppercase text-[#525252] mb-2">Afternoon</p>
+                  <p className="text-xs uppercase text-[#6b6b6b] mb-2">Afternoon</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">{afternoon.map(renderSlot)}</div>
                 </div>
               </>
@@ -187,7 +188,7 @@ export default function Book() {
   if (step === 3) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Confirm</h1>
+        <h1 className="text-2xl font-semibold">Confirm</h1>
         <Card>
           <CardContent className="p-4 space-y-2">
             <p><strong>Service:</strong> {selectedService?.name}</p>
@@ -214,9 +215,9 @@ export default function Book() {
 
   return (
     <div className="space-y-6 text-center">
-      <h1 className="text-2xl font-bold">Appointment booked</h1>
+      <h1 className="text-2xl font-semibold">Appointment booked</h1>
       <p>{selectedService?.name} · {toDateString(date)} · {selectedSlot}</p>
-      <p className="text-sm text-[#737373]">You can review or cancel it from your dashboard.</p>
+      <p className="text-sm text-[#6b6b6b]">You can review or cancel it from your dashboard.</p>
       <div className="flex gap-3 justify-center">
         <Button onClick={() => navigate("/dashboard")}>View my appointments</Button>
         <Button variant="outline" onClick={() => { setStep(1); setSelectedService(null); setDate(null); setSelectedSlot(null); setReason(""); setPhotoFile(null); }}>Book another</Button>
