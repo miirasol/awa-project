@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -26,13 +26,13 @@ export default function AdminLayout() {
 				<button onClick={() => setOpen(!open)}>
 					<Menu />
 				</button>
-				<span className="text-sm font-semibold">Clinic Appointment System</span>
+				<Link to="/" className="text-sm font-semibold">Clinic Appointment System</Link>
 			</div>
 			<aside
 				className={`${open ? "flex" : "hidden"} md:flex w-full md:w-[260px] bg-[#fafafa] border-b md:border-r border-[#e5e5e5] flex-col h-screen overflow-hidden`}
 			>
 				<div className="px-7 pt-8">
-					<div className="text-sm font-semibold">Clinic Appointment System</div>
+					<Link to="/" className="text-sm font-semibold">Clinic Appointment System</Link>
 				</div>
 				<nav className="px-4 mt-6 space-y-1 flex-1">
 					{items.map((it) => (

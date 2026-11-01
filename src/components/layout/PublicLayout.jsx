@@ -46,7 +46,14 @@ export default function PublicLayout() {
 		<div className="min-h-screen bg-white">
 			<div className="sticky top-0 z-50 bg-white">
 				<header className="h-16 border-b border-[#e5e5e5] px-8 flex items-center">
-					<Link to="/" className="text-sm font-semibold" onClick={() => setOpen(false)}>
+					<Link to="/" className="text-sm font-semibold" onClick={(e) => {
+							if (location.pathname === "/") {
+								e.preventDefault();
+								window.scrollTo({ top: 0, behavior: "smooth" });
+								window.history.replaceState(null, "", "/");
+							}
+							setOpen(false);
+						}}>
 						Clinic Appointment System
 					</Link>
 					<nav className="hidden md:flex ml-8 gap-1">
