@@ -5,19 +5,28 @@ import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function Patients() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [appts, setAppts] = useState([]);
   const [search, setSearch] = useState("");
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const u = await getDocs(collection(db, "users"));
-      setPatients(u.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.role === "patient"));
-      const a = await getDocs(collection(db, "appointments"));
-      setAppts(a.docs.map((d) => ({ id: d.id, ...d.data() })));
+      try {
+        const u = await getDocs(collection(db, "users"));
+        setPatients(u.docs.map((d) => ({ id: d.id, ...d.data() })).filter((x) => x.role === "patient"));
+        const a = await getDocs(collection(db, "appointments"));
+        setAppts(a.docs.map((d) => ({ id: d.id, ...d.data() })));
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -48,10 +57,17 @@ export default function Patients() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filtered.length === 0 && (
+          {loading && Array.from({ length: 5 }).map((_, i) => (
+            <TableRow key={i}>
+              {Array.from({ length: 5 }).map((_, j) => (
+                <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+              ))}
+            </TableRow>
+          ))}
+          {!loading && filtered.length === 0 && (
             <TableRow><TableCell colSpan={5} className="text-center text-[#6b6b6b]">No patients found.</TableCell></TableRow>
           )}
-          {filtered.map((p) => (
+          {!loading && filtered.map((p) => (
             <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/admin/patients/${p.id}`)}>
               <TableCell className="max-w-[14rem] truncate" title={p.fullName}>{p.fullName || "Unnamed patient"}</TableCell>
               <TableCell>{p.phone}</TableCell>
