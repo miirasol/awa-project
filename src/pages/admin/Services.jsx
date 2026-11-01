@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { uploadImage } from "@/lib/cloudinary";
 import { formatPrice } from "@/lib/format";
@@ -21,6 +21,7 @@ export default function Services() {
   const [form, setForm] = useState({ name: "", description: "", priceStart: "", priceMax: "", imageUrl: "", isActive: true });
   const [file, setFile] = useState(null);
 const [loading, setLoading] = useState(true);
+const [confirmDelete, setConfirmDelete] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -77,6 +78,19 @@ const [loading, setLoading] = useState(true);
     load();
   };
 
+  const deleteService = async () => {
+    if (!editing) return;
+    try {
+      await deleteDoc(doc(db, "services", editing.id));
+      setConfirmDelete(false);
+      setOpen(false);
+      load();
+      toast.success("Deleted");
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center gap-4">
@@ -128,8 +142,24 @@ const [loading, setLoading] = useState(true);
               <span className="text-sm">Active</span>
             </div>
           </div>
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+            {editing && (
+              <Button variant="destructive" onClick={() => setConfirmDelete(true)}>Delete service</Button>
+            )}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button onClick={save}>Save</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete this service?</DialogTitle></DialogHeader>
+          <p className="text-sm text-[#6b6b6b]">This will remove it from the list. Existing appointments keep the service name.</p>
           <DialogFooter>
-            <Button onClick={save}>Save</Button>
+            <Button variant="outline" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={deleteService}>Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
