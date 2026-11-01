@@ -30,6 +30,26 @@ export default function Settings() {
   }, []);
 
   const saveSchedule = async () => {
+    if (!form.openTime || !form.closeTime) {
+      toast.error("Open and close times are required");
+      return;
+    }
+    if (form.openTime >= form.closeTime) {
+      toast.error("Close time must be after open time");
+      return;
+    }
+    if ((form.breakStart && !form.breakEnd) || (!form.breakStart && form.breakEnd)) {
+      toast.error("Set both break start and break end, or neither");
+      return;
+    }
+    if (form.breakStart && form.breakEnd && form.breakStart >= form.breakEnd) {
+      toast.error("Break end must be after break start");
+      return;
+    }
+    if (form.breakStart && (form.breakStart < form.openTime || form.breakEnd > form.closeTime)) {
+      toast.error("Break must fall within clinic hours");
+      return;
+    }
     try {
       await setDoc(doc(db, "settings", "clinic"), form, { merge: true });
       toast.success("Saved");
@@ -51,8 +71,13 @@ export default function Settings() {
       toast.error("End date must be after start date");
       return;
     }
-    const start = new Date(newClosed);
-    const end = newClosedEnd ? new Date(newClosedEnd) : start;
+    const [sy, sm, sd] = newClosed.split("-").map(Number);
+    const start = new Date(sy, sm - 1, sd);
+    let end = start;
+    if (newClosedEnd) {
+      const [ey, em, ed] = newClosedEnd.split("-").map(Number);
+      end = new Date(ey, em - 1, ed);
+    }
     const dates = [];
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       dates.push(toDateStr(d));

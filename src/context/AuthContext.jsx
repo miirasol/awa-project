@@ -10,7 +10,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, googleProvider } from "@/lib/firebase";
 
 const AuthContext = createContext(null);
@@ -60,8 +60,10 @@ export function AuthProvider({ children }) {
               );
             } catch (err) {
               console.error(err);
+              creatingRef.current.delete(u.uid);
               await signOut(auth);
             }
+            creatingRef.current.delete(u.uid);
           }
         },
         (err) => {
@@ -96,7 +98,16 @@ export function AuthProvider({ children }) {
   const googleSignIn = async () => {
     const cred = await signInWithPopup(auth, googleProvider);
     const ref = doc(db, "users", cred.user.uid);
-    // best-effort; onSnapshot handles creation if missing
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        email: cred.user.email || "",
+        role: "patient",
+        fullName: cred.user.displayName || "",
+        phone: "",
+        createdAt: serverTimestamp(),
+      }, { merge: true });
+    }
     return cred;
   };
 
