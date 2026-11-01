@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LIMITS, tooLong } from "@/lib/limits";
 
 export default function Profile() {
@@ -15,14 +16,21 @@ export default function Profile() {
   const [form, setForm] = useState({ fullName: "", phone: "", birthdate: "", address: "" });
   const [avatarFile, setAvatarFile] = useState(null);
   const [saving, setSaving] = useState(false);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       if (!user) return;
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) {
-        const d = snap.data();
-        setForm({ fullName: d.fullName || "", phone: d.phone || "", birthdate: d.birthdate || "", address: d.address || "" });
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+          const d = snap.data();
+          setForm({ fullName: d.fullName || "", phone: d.phone || "", birthdate: d.birthdate || "", address: d.address || "" });
+        }
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setLoading(false);
       }
     })();
   }, [user]);
@@ -43,6 +51,8 @@ export default function Profile() {
     } catch (err) { toast.error(err.message); }
     finally { setSaving(false); }
   };
+
+  if (loading) return <div className="max-w-xl space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
 
   return (
     <div className="max-w-xl">
