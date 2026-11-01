@@ -111,6 +111,7 @@ export default function PatientDetail() {
         </TabsList>
         <TabsContent value="appointments">
           <div className="space-y-2">
+            {appts.length === 0 && <p className="text-[#6b6b6b]">No appointments.</p>}
             {appts.map((a) => (
               <Card key={a.id}><CardContent className="p-3 flex justify-between items-center">
                 <span className="min-w-0 break-words">{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}</span>
@@ -120,6 +121,7 @@ export default function PatientDetail() {
           </div>        </TabsContent>
         <TabsContent value="records" className="space-y-3">
           <Button onClick={openNew}>Add visit record</Button>
+          {records.length === 0 && <p className="text-[#6b6b6b]">No visit records yet.</p>}
           {records.map((r) => (
             <Card key={r.id}>
               <CardContent className="p-4 space-y-1 break-words">
