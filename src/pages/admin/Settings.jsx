@@ -22,11 +22,18 @@ export default function Settings() {
   });
   const [newClosed, setNewClosed] = useState("");
   const [newClosedEnd, setNewClosedEnd] = useState("");
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const snap = await getDoc(doc(db, "settings", "clinic"));
-      if (snap.exists()) setForm((prev) => ({ ...prev, ...snap.data(), slotMinutes: snap.data().slotMinutes ?? prev.slotMinutes }));
+      try {
+        const snap = await getDoc(doc(db, "settings", "clinic"));
+        if (snap.exists()) setForm((prev) => ({ ...prev, ...snap.data(), slotMinutes: snap.data().slotMinutes ?? prev.slotMinutes }));
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
