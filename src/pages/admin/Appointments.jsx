@@ -53,13 +53,13 @@ function Row({ a, name, phone, now, showDate, onDetails, onConfirm, onRun }) {
         {a.status === "cancel_requested" && (
           <>
             <Button size="sm" onClick={() => onConfirm({ fn: approveCancellation, appt: a, title: "Approve cancellation?" })}>Approve</Button>
-            <Button size="sm" variant="outline" onClick={() => onRun(rejectCancellation, a)}>Reject</Button>
+            <Button size="sm" variant="outline" onClick={() => onConfirm({ fn: rejectCancellation, appt: a, title: "Reject cancellation request?" })}>Reject</Button>
           </>
         )}
         {a.status === "confirmed" && past && (
           <>
-            <Button size="sm" onClick={() => onRun(markCompleted, a)}>Complete</Button>
-            <Button size="sm" variant="outline" onClick={() => onRun(markNoShow, a)}>No-show</Button>
+            <Button size="sm" onClick={() => onConfirm({ fn: markCompleted, appt: a, title: "Mark as completed?" })}>Complete</Button>
+            <Button size="sm" variant="outline" onClick={() => onConfirm({ fn: markNoShow, appt: a, title: "Mark as no-show?" })}>No-show</Button>
           </>
         )}
         {a.status === "confirmed" && !past && (
@@ -254,18 +254,24 @@ export default function Appointments() {
           {confirm && (
             <>
               <p className="break-words text-[#6b6b6b]">
-                {confirm.appt.serviceName} · {confirm.appt.date} {confirm.appt.time}
+                {nameOf(confirm.appt.patientId)} · {confirm.appt.serviceName} · {confirm.appt.date} {confirm.appt.time}
               </p>
               <p className="text-sm text-[#6b6b6b]">
                 {confirm.fn === cancelAppointment
                   ? "This will free up the time slot."
+                  : confirm.fn === markCompleted
+                  ? "Mark this appointment as completed."
+                  : confirm.fn === markNoShow
+                  ? "Mark this appointment as no-show."
+                  : confirm.fn === rejectCancellation
+                  ? "Return this appointment to confirmed."
                   : "Confirm this action."}
               </p>
             </>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirm(null)}>No, keep it</Button>
-            <Button variant="destructive" onClick={() => run(confirm.fn, confirm.appt)}>Yes</Button>
+            <Button variant={confirm?.fn === markCompleted ? "default" : "destructive"} onClick={() => run(confirm.fn, confirm.appt)}>Yes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
