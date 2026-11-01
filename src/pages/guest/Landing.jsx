@@ -43,7 +43,7 @@ export default function Landing() {
 
   return (
     <div className="space-y-12">
-      <section id="hero" className={container}>
+      <section id="hero" className={container + " scroll-mt-20"}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
             <p className="text-sm text-[#6b6b6b]">Care starts with you</p>
@@ -57,9 +57,9 @@ export default function Landing() {
           <img src={heroImg} alt="Clinic" className="rounded-xl object-cover hidden md:block w-full max-w-[580px]" style={{ aspectRatio: "16/10" }} />
         </div>
       </section>
-      <section id="services" className={container}>
+      <section id="services" className={container + " scroll-mt-20"}>
         <h2 className="text-2xl font-semibold mb-4">Services</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((s) => (
             <Card key={s.id} className="rounded-xl border">
               <CardContent className="p-3">
@@ -82,7 +82,7 @@ export default function Landing() {
           ))}
         </div>
       </section>
-      <section id="about" className={container}>
+      <section id="about" className={container + " scroll-mt-20"}>
         <h2 className="text-2xl font-semibold mb-4">About Us</h2>
         <p className="text-sm text-[#6b6b6b] mb-4">
           {settings?.aboutText || "Quality dental care, from check-ups to specialized treatments."}
@@ -99,7 +99,7 @@ export default function Landing() {
           ))}
         </div>
         {settings && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card className="rounded-xl border">
               <CardContent className="p-4">
                 <p className="text-xs text-[#6b6b6b]">Open days</p>
@@ -121,7 +121,7 @@ export default function Landing() {
           </div>
         )}
       </section>
-      <footer id="contact" className="w-full bg-[#f9f9f9] border-t border-[#e5e5e5]">
+      <footer id="contact" className="w-full bg-[#f9f9f9] border-t border-[#e5e5e5] scroll-mt-20">
         <div className={container + " py-8"}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>

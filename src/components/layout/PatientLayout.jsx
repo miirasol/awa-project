@@ -24,7 +24,7 @@ export default function PatientLayout() {
 				<button onClick={() => setOpen(!open)}>
 					<Menu />
 				</button>
-				<Button size="sm" onClick={() => navigate("/book")}>
+				<Button size="sm" onClick={() => { setOpen(false); navigate("/book"); }}>
 					Book Appointment
 				</Button>
 			</div>
@@ -33,7 +33,7 @@ export default function PatientLayout() {
 			>
 				<div className="px-7 pt-8">
 					<div className="text-sm font-semibold">Clinic Appointment System</div>
-					<Button className="w-full mt-4" onClick={() => navigate("/book")}>
+					<Button className="w-full mt-4" onClick={() => { setOpen(false); navigate("/book"); }}>
 						Book Appointment
 					</Button>
 				</div>
