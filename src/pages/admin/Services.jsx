@@ -19,10 +19,18 @@ export default function Services() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: "", description: "", priceStart: "", priceMax: "", imageUrl: "", isActive: true });
   const [file, setFile] = useState(null);
+const [loading, setLoading] = useState(true);
 
   const load = async () => {
-    const snap = await getDocs(collection(db, "services"));
-    setServices(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    setLoading(true);
+    try {
+      const snap = await getDocs(collection(db, "services"));
+      setServices(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -75,7 +83,9 @@ export default function Services() {
         <Button onClick={openNew}>Add service</Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {services.map((s) => (
+        {loading && <p className="text-[#6b6b6b]">Loading...</p>}
+        {!loading && services.length === 0 && <p className="text-[#6b6b6b]">No services yet.</p>}
+        {!loading && services.map((s) => (
           <Card key={s.id} className="h-full">
             <CardContent className="p-4 flex flex-1 flex-col gap-2">
               {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
