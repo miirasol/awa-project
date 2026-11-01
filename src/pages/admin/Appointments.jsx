@@ -248,15 +248,24 @@ export default function Appointments() {
 
       <Dialog open={!!confirm} onOpenChange={() => setConfirm(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{confirm?.title || "Confirm action"}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{confirm?.title || "Confirm action"}</DialogTitle>
+          </DialogHeader>
           {confirm && (
-            <p className="break-words">
-              {nameOf(confirm.appt.patientId)} · {formatDate(confirm.appt.date)} {formatTime(confirm.appt.time)} · {confirm.appt.serviceName}
-            </p>
+            <>
+              <p className="break-words text-[#6b6b6b]">
+                {confirm.appt.serviceName} · {confirm.appt.date} {confirm.appt.time}
+              </p>
+              <p className="text-sm text-[#6b6b6b]">
+                {confirm.fn === cancelAppointment
+                  ? "This will free up the time slot."
+                  : "Confirm this action."}
+              </p>
+            </>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirm(null)}>No</Button>
-            <Button onClick={() => run(confirm.fn, confirm.appt)}>Yes</Button>
+            <Button variant="outline" onClick={() => setConfirm(null)}>No, keep it</Button>
+            <Button variant="destructive" onClick={() => run(confirm.fn, confirm.appt)}>Yes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
