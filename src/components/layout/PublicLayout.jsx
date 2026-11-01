@@ -54,11 +54,15 @@ export default function PublicLayout() {
 								key={l.label}
 								to={l.to}
 								onClick={(e) => {
-									if (l.label === "Home") {
-										if (location.pathname === "/") {
-											e.preventDefault();
-											window.scrollTo({ top: 0, behavior: "smooth" });
-										}
+									if (location.pathname === "/" && l.to.includes("#")) {
+										e.preventDefault();
+										const id = l.to.split("#")[1];
+										document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+										window.history.replaceState(null, "", `/#${id}`);
+									} else if (l.label === "Home" && location.pathname === "/") {
+										e.preventDefault();
+										window.scrollTo({ top: 0, behavior: "smooth" });
+										window.history.replaceState(null, "", "/");
 									}
 									setOpen(false);
 								}}
@@ -104,9 +108,15 @@ export default function PublicLayout() {
 									key={l.label}
 									to={l.to}
 									onClick={(e) => {
-										if (l.label === "Home" && location.pathname === "/") {
+										if (location.pathname === "/" && l.to.includes("#")) {
+											e.preventDefault();
+											const id = l.to.split("#")[1];
+											document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+											window.history.replaceState(null, "", `/#${id}`);
+										} else if (l.label === "Home" && location.pathname === "/") {
 											e.preventDefault();
 											window.scrollTo({ top: 0, behavior: "smooth" });
+											window.history.replaceState(null, "", "/");
 										}
 										setOpen(false);
 									}}
