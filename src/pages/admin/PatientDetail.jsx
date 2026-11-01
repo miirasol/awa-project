@@ -12,7 +12,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
+import ImageLightbox from "@/components/ImageLightbox";import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { statusLabel, formatDate, formatTime } from "@/lib/format";
 
 export default function PatientDetail() {
@@ -23,6 +24,7 @@ export default function PatientDetail() {
   const [records, setRecords] = useState([]);
   const [open, setOpen] = useState(false);
   const [detailsAppt, setDetailsAppt] = useState(null);  const [editing, setEditing] = useState(null);
+const [lightboxSrc, setLightboxSrc] = useState(null);
   const [selectedAppt, setSelectedAppt] = useState("");
   const [procedure, setProcedure] = useState("");
   const [notes, setNotes] = useState("");
@@ -131,7 +133,7 @@ export default function PatientDetail() {
                 {r.nextVisitSuggestion && <p className="text-sm text-[#6b6b6b]">Next: {r.nextVisitSuggestion}</p>}
                 {r.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => window.open(u, "_blank")} />)}                  </div>
+                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => setLightboxSrc(u)} />)}                  </div>
                 )}
                 <Button size="sm" variant="outline" onClick={() => openEdit(r)}>Edit</Button>
               </CardContent>
@@ -169,6 +171,7 @@ export default function PatientDetail() {
         </DialogContent>
       </Dialog>
       <AppointmentDetailsDialog open={!!detailsAppt} onOpenChange={() => setDetailsAppt(null)} appointment={detailsAppt} />
+      <ImageLightbox src={lightboxSrc} open={!!lightboxSrc} onOpenChange={() => setLightboxSrc(null)} />
     </div>
   );
 }

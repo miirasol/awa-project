@@ -19,6 +19,7 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
+import ImageLightbox from "@/components/ImageLightbox";
 
 
 export default function Dashboard() {
@@ -29,6 +30,7 @@ export default function Dashboard() {
 	const [confirmAppt, setConfirmAppt] = useState(null);
 	const [action, setAction] = useState(null);
 	const [detailsAppt, setDetailsAppt] = useState(null);
+const [lightboxSrc, setLightboxSrc] = useState(null);
 const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		if (!user) return;
@@ -236,7 +238,7 @@ const [loading, setLoading] = useState(true);
 													src={u}
 													alt={`Attachment ${i + 1}`}
 													className="w-16 h-16 object-cover rounded cursor-pointer"
-													onClick={() => window.open(u, "_blank")}
+													onClick={() => setLightboxSrc(u)}
 												/>
 											))}
 										</div>
@@ -257,6 +259,7 @@ const [loading, setLoading] = useState(true);
 					})}{" "}
 				</TabsContent>
 			</Tabs>
+			<ImageLightbox src={lightboxSrc} open={!!lightboxSrc} onOpenChange={() => setLightboxSrc(null)} />
 			<AppointmentDetailsDialog
 				open={!!detailsAppt}
 				onOpenChange={() => setDetailsAppt(null)}
