@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { seedSampleData } from "@/lib/seed";
@@ -116,6 +117,8 @@ const [loading, setLoading] = useState(true);
       openDays: f.openDays.includes(i) ? f.openDays.filter((x) => x !== i) : [...f.openDays, i],
     }));
   };
+
+  if (loading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
 
   return (
     <div className="space-y-6">
