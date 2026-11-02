@@ -47,52 +47,53 @@ export default function Landing() {
 
   const container = "mx-auto w-full max-w-[1140px] px-6";
 
-  if (loading) return (
-    <div className="space-y-12">
-      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <div className="mt-6 flex gap-3">
-              <Skeleton className="h-10 w-40" />
-              <Skeleton className="h-10 w-36" />
+  if (loading)
+    return (
+      <div className="space-y-12">
+        <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="mt-6 flex gap-3">
+                <Skeleton className="h-10 w-40" />
+                <Skeleton className="h-10 w-36" />
+              </div>
             </div>
+            <Skeleton className="hidden md:block w-full max-w-[580px] rounded-xl" style={{ aspectRatio: "16/10" }} />
           </div>
-          <Skeleton className="hidden md:block w-full max-w-[580px] rounded-xl" style={{ aspectRatio: "16/10" }} />
-        </div>
-      </section>
-      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
-        <Skeleton className="h-8 w-32 mb-4" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="rounded-xl border h-full">
-              <CardContent className="p-3 space-y-2">
-                <Skeleton className="w-full h-52 rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-4 w-full" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-      <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
-        <Skeleton className="h-8 w-32 mb-4" />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-xl" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-xl" />
-          ))}
-        </div>
-      </section>
-    </div>
-  );
+        </section>
+        <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+          <Skeleton className="h-8 w-32 mb-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="rounded-xl border h-full">
+                <CardContent className="p-3 space-y-2">
+                  <Skeleton className="w-full h-52 rounded-lg" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+        <section className="mx-auto w-full max-w-[1140px] px-6 scroll-mt-20">
+          <Skeleton className="h-8 w-32 mb-4" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-xl" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full rounded-xl" />
+            ))}
+          </div>
+        </section>
+      </div>
+    );
 
   return (
     <div className="space-y-12">
@@ -104,10 +105,20 @@ export default function Landing() {
             <p className="text-[#6b6b6b] mt-3">Schedule your appointment in minutes.</p>
             <div className="mt-6 flex gap-3">
               <Button onClick={() => navigate("/book")}>Book an appointment</Button>
-              <Button variant="outline" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}>View services</Button>
+              <Button
+                variant="outline"
+                onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                View services
+              </Button>
             </div>
           </div>
-          <img src={heroImg} alt="Clinic" className="rounded-xl object-cover hidden md:block w-full max-w-[580px]" style={{ aspectRatio: "16/10" }} />
+          <img
+            src={heroImg}
+            alt="Clinic"
+            className="rounded-xl object-cover hidden md:block w-full max-w-[580px]"
+            style={{ aspectRatio: "16/10" }}
+          />
         </div>
       </section>
       <section id="services" className={container + " scroll-mt-20"}>
@@ -153,13 +164,20 @@ export default function Landing() {
             <Card className="rounded-xl border">
               <CardContent className="p-4">
                 <p className="text-xs text-[#6b6b6b]">Open days</p>
-                <p className="font-semibold">{[...(settings.openDays || [])].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b)).map((d) => days[d]).join(", ")}</p>
+                <p className="font-semibold">
+                  {[...(settings.openDays || [])]
+                    .sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b))
+                    .map((d) => days[d])
+                    .join(", ")}
+                </p>
               </CardContent>
             </Card>
             <Card className="rounded-xl border">
               <CardContent className="p-4">
                 <p className="text-xs text-[#6b6b6b]">Hours</p>
-                <p className="font-semibold">{to12Hour(settings.openTime)} – {to12Hour(settings.closeTime)}</p>
+                <p className="font-semibold">
+                  {to12Hour(settings.openTime)} – {to12Hour(settings.closeTime)}
+                </p>
               </CardContent>
             </Card>
             <Card className="rounded-xl border">
@@ -190,16 +208,30 @@ export default function Landing() {
             </div>
             <div>
               <p className="text-sm font-semibold mb-2">Clinic hours</p>
-              <p className="text-sm text-[#6b6b6b]">{[...(settings?.openDays || [])].sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b)).map((d) => days[d]).join(", ")}</p>
-              <p className="text-sm text-[#6b6b6b]">{to12Hour(settings?.openTime)} – {to12Hour(settings?.closeTime)}</p>
               <p className="text-sm text-[#6b6b6b]">
-              Break: {settings?.breakStart && settings?.breakEnd ? `${to12Hour(settings.breakStart)} – ${to12Hour(settings.breakEnd)}` : "No break"}
-            </p>
+                {[...(settings?.openDays || [])]
+                  .sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b))
+                  .map((d) => days[d])
+                  .join(", ")}
+              </p>
+              <p className="text-sm text-[#6b6b6b]">
+                {to12Hour(settings?.openTime)} – {to12Hour(settings?.closeTime)}
+              </p>
+              <p className="text-sm text-[#6b6b6b]">
+                Break:{" "}
+                {settings?.breakStart && settings?.breakEnd
+                  ? `${to12Hour(settings.breakStart)} – ${to12Hour(settings.breakEnd)}`
+                  : "No break"}
+              </p>
             </div>
             <div>
               <p className="text-sm font-semibold mb-2">Account</p>
-              <Link to="/login" className="block text-sm text-[#6b6b6b]">Log in</Link>
-              <Link to="/register" className="block text-sm text-[#6b6b6b]">Register</Link>
+              <Link to="/login" className="block text-sm text-[#6b6b6b]">
+                Log in
+              </Link>
+              <Link to="/register" className="block text-sm text-[#6b6b6b]">
+                Register
+              </Link>
             </div>
           </div>
           <p className="text-xs text-[#6b6b6b] mt-6">© 2026 Clinic Appointment System</p>

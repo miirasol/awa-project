@@ -1,6 +1,9 @@
 export function formatPrice(priceRange) {
   if (!priceRange) return "";
-  const parts = String(priceRange).split("-").map((p) => p.trim()).filter(Boolean);
+  const parts = String(priceRange)
+    .split("-")
+    .map((p) => p.trim())
+    .filter(Boolean);
   if (parts.length === 0) return "";
   const formatted = parts.map((p) => {
     const n = Number(p);

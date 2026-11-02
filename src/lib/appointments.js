@@ -1,4 +1,14 @@
-import { runTransaction, writeBatch, updateDoc, doc, collection, query, where, getDocs, serverTimestamp } from "firebase/firestore";
+import {
+  runTransaction,
+  writeBatch,
+  updateDoc,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { slotId, toStartAt } from "@/lib/dates";
 
@@ -10,9 +20,15 @@ export async function bookAppointment({ uid, service, date, time, reason, photoU
     if (snap.exists()) throw new Error("SLOT_TAKEN");
     tx.set(slotRef, { appointmentId: apptRef.id, patientId: uid, date, time });
     tx.set(apptRef, {
-      patientId: uid, serviceId: service.id, serviceName: service.name,
-      date, time, startAt: toStartAt(date, time),
-      status: "confirmed", reason: reason || "", photoUrl: photoUrl || "",
+      patientId: uid,
+      serviceId: service.id,
+      serviceName: service.name,
+      date,
+      time,
+      startAt: toStartAt(date, time),
+      status: "confirmed",
+      reason: reason || "",
+      photoUrl: photoUrl || "",
       createdAt: serverTimestamp(),
     });
   });
@@ -30,12 +46,9 @@ export const requestCancellation = (appt) =>
   updateDoc(doc(db, "appointments", appt.id), { status: "cancel_requested" });
 
 export const approveCancellation = cancelAppointment;
-export const rejectCancellation = (appt) =>
-  updateDoc(doc(db, "appointments", appt.id), { status: "confirmed" });
-export const markCompleted = (appt) =>
-  updateDoc(doc(db, "appointments", appt.id), { status: "completed" });
-export const markNoShow = (appt) =>
-  updateDoc(doc(db, "appointments", appt.id), { status: "no_show" });
+export const rejectCancellation = (appt) => updateDoc(doc(db, "appointments", appt.id), { status: "confirmed" });
+export const markCompleted = (appt) => updateDoc(doc(db, "appointments", appt.id), { status: "completed" });
+export const markNoShow = (appt) => updateDoc(doc(db, "appointments", appt.id), { status: "no_show" });
 
 export async function countUpcomingConfirmed(uid) {
   const q = query(collection(db, "appointments"), where("patientId", "==", uid));

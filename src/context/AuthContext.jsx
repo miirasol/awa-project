@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
                   phone: "",
                   createdAt: serverTimestamp(),
                 },
-                { merge: true }
+                { merge: true },
               );
             } catch (err) {
               console.error(err);
@@ -74,7 +74,7 @@ export function AuthProvider({ children }) {
         (err) => {
           console.error(err);
           signOut(auth);
-        }
+        },
       );
     });
     return () => {
@@ -102,7 +102,12 @@ export function AuthProvider({ children }) {
         });
       } catch (err) {
         // Profile write failed: remove the auth account so we never keep a login with no/blank profile
-        try { await deleteUser(cred.user); } catch (e) { console.error(e); await signOut(auth); }
+        try {
+          await deleteUser(cred.user);
+        } catch (e) {
+          console.error(e);
+          await signOut(auth);
+        }
         throw err;
       }
       return cred;
@@ -116,13 +121,17 @@ export function AuthProvider({ children }) {
     const ref = doc(db, "users", cred.user.uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) {
-      await setDoc(ref, {
-        email: cred.user.email || "",
-        role: "patient",
-        fullName: (cred.user.displayName || "").slice(0, LIMITS.personName),
-        phone: "",
-        createdAt: serverTimestamp(),
-      }, { merge: true });
+      await setDoc(
+        ref,
+        {
+          email: cred.user.email || "",
+          role: "patient",
+          fullName: (cred.user.displayName || "").slice(0, LIMITS.personName),
+          phone: "",
+          createdAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
     }
     return cred;
   };

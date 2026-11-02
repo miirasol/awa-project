@@ -37,7 +37,12 @@ export default function Profile() {
         const snap = await getDoc(doc(db, "users", user.uid));
         if (snap.exists()) {
           const d = snap.data();
-          setForm({ fullName: d.fullName || "", phone: d.phone || "", birthdate: d.birthdate || "", address: d.address || "" });
+          setForm({
+            fullName: d.fullName || "",
+            phone: d.phone || "",
+            birthdate: d.birthdate || "",
+            address: d.address || "",
+          });
         }
       } catch (e) {
         toast.error(e.message);
@@ -50,18 +55,33 @@ export default function Profile() {
   const save = async (e) => {
     if (e) e.preventDefault();
     if (!user) return;
-    if (!form.fullName?.trim()) { toast.error("Full name is required"); return; }
-    if (tooLong(form.fullName, LIMITS.personName)) { toast.error(`Name must be ${LIMITS.personName} characters or fewer`); return; }
-    if (tooLong(form.address, LIMITS.address)) { toast.error(`Address must be ${LIMITS.address} characters or fewer`); return; }
-    if (form.phone && !/^[0-9+\-()\s]{6,}$/.test(form.phone)) { toast.error("Invalid phone number"); return; }
+    if (!form.fullName?.trim()) {
+      toast.error("Full name is required");
+      return;
+    }
+    if (tooLong(form.fullName, LIMITS.personName)) {
+      toast.error(`Name must be ${LIMITS.personName} characters or fewer`);
+      return;
+    }
+    if (tooLong(form.address, LIMITS.address)) {
+      toast.error(`Address must be ${LIMITS.address} characters or fewer`);
+      return;
+    }
+    if (form.phone && !/^[0-9+\-()\s]{6,}$/.test(form.phone)) {
+      toast.error("Invalid phone number");
+      return;
+    }
     setSaving(true);
     try {
       const data = { ...form, fullName: form.fullName.trim(), address: form.address.trim(), phone: form.phone.trim() };
       if (avatarFile) data.avatarUrl = await uploadImage(avatarFile);
       await updateDoc(doc(db, "users", user.uid), data);
       toast.success("Saved");
-    } catch (err) { toast.error(err.message); }
-    finally { setSaving(false); }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const initials = (() => {
@@ -100,9 +120,7 @@ export default function Profile() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xl font-semibold">{form.fullName || "Your name"}</span>
-          {roleLabel && (
-            <span className="rounded-full bg-muted text-[11px] px-2 py-0.5">{roleLabel}</span>
-          )}
+          {roleLabel && <span className="rounded-full bg-muted text-[11px] px-2 py-0.5">{roleLabel}</span>}
         </div>
         <p className="text-sm text-muted-foreground">{profile?.email || ""}</p>
       </div>
@@ -110,7 +128,9 @@ export default function Profile() {
       <Card className="rounded-xl border bg-card">
         <CardHeader className="p-5">
           <CardTitle className="text-[15px] font-semibold">Profile settings</CardTitle>
-          <CardDescription className="text-[13px] text-muted-foreground">Update your personal information.</CardDescription>
+          <CardDescription className="text-[13px] text-muted-foreground">
+            Update your personal information.
+          </CardDescription>
         </CardHeader>
         <form id="profile-form" onSubmit={save}>
           <CardContent className="px-5 pb-5 space-y-4">

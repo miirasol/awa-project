@@ -83,8 +83,15 @@ describe("addDays", () => {
 
 describe("groupByDate / dayLabel", () => {
   it("groups consecutive appointments by date", () => {
-    const g = groupByDate([mk("a", "2026-11-04", "09:00", "confirmed"), mk("b", "2026-11-04", "10:00", "confirmed"), mk("c", "2026-11-06", "09:00", "confirmed")]);
-    expect(g.map((x) => [x.date, x.items.length])).toEqual([["2026-11-04", 2], ["2026-11-06", 1]]);
+    const g = groupByDate([
+      mk("a", "2026-11-04", "09:00", "confirmed"),
+      mk("b", "2026-11-04", "10:00", "confirmed"),
+      mk("c", "2026-11-06", "09:00", "confirmed"),
+    ]);
+    expect(g.map((x) => [x.date, x.items.length])).toEqual([
+      ["2026-11-04", 2],
+      ["2026-11-06", 1],
+    ]);
   });
 
   it("labels today, tomorrow and yesterday", () => {
@@ -96,7 +103,11 @@ describe("groupByDate / dayLabel", () => {
 });
 
 describe("filterHistory", () => {
-  const list = [mk("a", "2026-10-30", "09:00", "completed"), mk("b", "2026-11-02", "09:00", "cancelled"), mk("c", "2026-11-05", "09:00", "no_show")];
+  const list = [
+    mk("a", "2026-10-30", "09:00", "completed"),
+    mk("b", "2026-11-02", "09:00", "cancelled"),
+    mk("c", "2026-11-05", "09:00", "no_show"),
+  ];
   const text = (a) => ({ a: "Noreen braces", b: "James cleaning", c: "Benedict braces" })[a.id];
 
   it("filters by status, date range and text", () => {

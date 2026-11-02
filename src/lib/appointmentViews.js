@@ -59,7 +59,12 @@ export function dayLabel(dateStr, todayStr) {
   if (dateStr === addDays(todayStr, 1)) return "Tomorrow";
   if (dateStr === addDays(todayStr, -1)) return "Yesterday";
   const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 /** History filters. textOf(a) returns the searchable text (name, email, phone, service...). */

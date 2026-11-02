@@ -45,7 +45,10 @@ export default function Book() {
         const pre = searchParams.get("service");
         if (pre) {
           const found = list.find((x) => x.id === pre);
-          if (found) { setSelectedService(found); setStep(2); }
+          if (found) {
+            setSelectedService(found);
+            setStep(2);
+          }
         }
       } catch (e) {
         toast.error(e.message);
@@ -58,7 +61,10 @@ export default function Book() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selected slot when date changes
     setSelectedSlot(null);
-    if (!date || !settings) { setSlots([]); return; }
+    if (!date || !settings) {
+      setSlots([]);
+      return;
+    }
     const ds = toDateString(date);
     setSlots(generateSlots(settings, ds));
     const q = query(collection(db, "slots"), where("date", "==", ds));
@@ -99,7 +105,14 @@ export default function Book() {
       let photoUrl = "";
       if (photoFile) photoUrl = await uploadImage(photoFile);
       const ds = toDateString(date);
-      await bookAppointment({ uid: user.uid, service: selectedService, date: ds, time: selectedSlot, reason, photoUrl });
+      await bookAppointment({
+        uid: user.uid,
+        service: selectedService,
+        date: ds,
+        time: selectedSlot,
+        reason,
+        photoUrl,
+      });
       setStep(4);
     } catch (e) {
       if (e.message === "SLOT_TAKEN" || e.code === "permission-denied") {
@@ -118,11 +131,13 @@ export default function Book() {
 
   if (profileIncomplete) {
     return (
-      <Card><CardContent className="p-6 text-center space-y-3">
-        <h1 className="text-xl font-semibold">Complete your profile first</h1>
-        <p className="text-sm text-[#6b6b6b]">We need your full name before you can book an appointment.</p>
-        <Button onClick={() => navigate("/profile")}>Go to Profile settings</Button>
-      </CardContent></Card>
+      <Card>
+        <CardContent className="p-6 text-center space-y-3">
+          <h1 className="text-xl font-semibold">Complete your profile first</h1>
+          <p className="text-sm text-[#6b6b6b]">We need your full name before you can book an appointment.</p>
+          <Button onClick={() => navigate("/profile")}>Go to Profile settings</Button>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -133,21 +148,31 @@ export default function Book() {
         {services.length === 0 ? (
           <p className="text-[#6b6b6b]">No services available right now.</p>
         ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {services.map((s) => (
-            <Card key={s.id} className="h-full">
-              <CardContent className="p-4 flex flex-1 flex-col gap-2">
-                {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
-                <h3 className="font-semibold break-words">{s.name}</h3>
-                <p className="text-sm text-[#6b6b6b] break-words">{s.description}</p>
-                <p className="text-sm">{formatPrice(s.priceRange)}</p>
-                <div className="mt-auto pt-2">
-                  <Button className="w-full" onClick={() => { setSelectedService(s); setSelectedSlot(null); setDate(null); setStep(2); }}>Select</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {services.map((s) => (
+              <Card key={s.id} className="h-full">
+                <CardContent className="p-4 flex flex-1 flex-col gap-2">
+                  {s.imageUrl && <img src={s.imageUrl} alt={s.name} className="w-full h-32 object-cover rounded" />}
+                  <h3 className="font-semibold break-words">{s.name}</h3>
+                  <p className="text-sm text-[#6b6b6b] break-words">{s.description}</p>
+                  <p className="text-sm">{formatPrice(s.priceRange)}</p>
+                  <div className="mt-auto pt-2">
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        setSelectedService(s);
+                        setSelectedSlot(null);
+                        setDate(null);
+                        setStep(2);
+                      }}
+                    >
+                      Select
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     );
@@ -179,7 +204,16 @@ export default function Book() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold">Pick a date and time</h1>
-          <Button variant="outline" onClick={() => { setStep(1); setSelectedSlot(null); setDate(null); }}>Change service</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setStep(1);
+              setSelectedSlot(null);
+              setDate(null);
+            }}
+          >
+            Change service
+          </Button>
         </div>
         <p className="text-sm text-[#6b6b6b]">Booking: {selectedService?.name}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -187,7 +221,10 @@ export default function Book() {
             <CardContent className="p-4">
               <Calendar mode="single" selected={date} onSelect={setDate} disabled={disabledDay} className="w-full" />
               <p className="text-xs text-[#6b6b6b] mt-2">
-                Closed days: {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].filter((_, i) => !settings.openDays.includes(i)).join(", ")}
+                Closed days:{" "}
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                  .filter((_, i) => !settings.openDays.includes(i))
+                  .join(", ")}
               </p>
             </CardContent>
           </Card>
@@ -207,8 +244,12 @@ export default function Book() {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-          <Button disabled={!selectedSlot} onClick={() => setStep(3)}>Continue</Button>
+          <Button variant="outline" onClick={() => setStep(1)}>
+            Back
+          </Button>
+          <Button disabled={!selectedSlot} onClick={() => setStep(3)}>
+            Continue
+          </Button>
         </div>
       </div>
     );
@@ -220,10 +261,18 @@ export default function Book() {
         <h1 className="text-2xl font-semibold">Confirm</h1>
         <Card>
           <CardContent className="p-4 space-y-2">
-            <p className="break-words"><strong>Service:</strong> {selectedService?.name}</p>
-            <p><strong>Date:</strong> {toDateString(date)}</p>
-            <p><strong>Time:</strong> {selectedSlot}</p>
-            <p className="break-words"><strong>Location:</strong> {settings?.address}</p>
+            <p className="break-words">
+              <strong>Service:</strong> {selectedService?.name}
+            </p>
+            <p>
+              <strong>Date:</strong> {toDateString(date)}
+            </p>
+            <p>
+              <strong>Time:</strong> {selectedSlot}
+            </p>
+            <p className="break-words">
+              <strong>Location:</strong> {settings?.address}
+            </p>
           </CardContent>
         </Card>
         <div>
@@ -235,8 +284,12 @@ export default function Book() {
           <Input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files[0])} />
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
-          <Button onClick={doBook} disabled={booking}>{booking ? "Booking..." : "Confirm booking"}</Button>
+          <Button variant="outline" onClick={() => setStep(2)}>
+            Back
+          </Button>
+          <Button onClick={doBook} disabled={booking}>
+            {booking ? "Booking..." : "Confirm booking"}
+          </Button>
         </div>
       </div>
     );
@@ -245,11 +298,25 @@ export default function Book() {
   return (
     <div className="space-y-6 text-center">
       <h1 className="text-2xl font-semibold">Appointment booked</h1>
-      <p>{selectedService?.name} · {toDateString(date)} · {selectedSlot}</p>
+      <p>
+        {selectedService?.name} · {toDateString(date)} · {selectedSlot}
+      </p>
       <p className="text-sm text-[#6b6b6b]">You can review or cancel it from your dashboard.</p>
       <div className="flex gap-3 justify-center">
         <Button onClick={() => navigate("/dashboard")}>View my appointments</Button>
-        <Button variant="outline" onClick={() => { setStep(1); setSelectedService(null); setDate(null); setSelectedSlot(null); setReason(""); setPhotoFile(null); }}>Book another</Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setStep(1);
+            setSelectedService(null);
+            setDate(null);
+            setSelectedSlot(null);
+            setReason("");
+            setPhotoFile(null);
+          }}
+        >
+          Book another
+        </Button>
       </div>
     </div>
   );

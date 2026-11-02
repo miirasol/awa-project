@@ -17,19 +17,28 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 export default function Settings() {
   const [form, setForm] = useState({
-    clinicName: "", address: "", phone: "", email: "",
-    openDays: [], openTime: "09:00", closeTime: "17:00",
-    breakStart: "", breakEnd: "", closedDates: [], slotMinutes: 30,
+    clinicName: "",
+    address: "",
+    phone: "",
+    email: "",
+    openDays: [],
+    openTime: "09:00",
+    closeTime: "17:00",
+    breakStart: "",
+    breakEnd: "",
+    closedDates: [],
+    slotMinutes: 30,
   });
   const [newClosed, setNewClosed] = useState("");
   const [newClosedEnd, setNewClosedEnd] = useState("");
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         const snap = await getDoc(doc(db, "settings", "clinic"));
-        if (snap.exists()) setForm((prev) => ({ ...prev, ...snap.data(), slotMinutes: snap.data().slotMinutes ?? prev.slotMinutes }));
+        if (snap.exists())
+          setForm((prev) => ({ ...prev, ...snap.data(), slotMinutes: snap.data().slotMinutes ?? prev.slotMinutes }));
       } catch (e) {
         toast.error(e.message);
       } finally {
@@ -62,18 +71,35 @@ const [loading, setLoading] = useState(true);
     try {
       await setDoc(doc(db, "settings", "clinic"), form, { merge: true });
       toast.success("Saved");
-    } catch (e) { toast.error(e.message); }
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
 
   const saveInfo = async () => {
-    if (tooLong(form.clinicName, LIMITS.clinicName)) { toast.error(`Clinic name must be ${LIMITS.clinicName} characters or fewer`); return; }
-    if (tooLong(form.address, LIMITS.address)) { toast.error(`Address must be ${LIMITS.address} characters or fewer`); return; }
+    if (tooLong(form.clinicName, LIMITS.clinicName)) {
+      toast.error(`Clinic name must be ${LIMITS.clinicName} characters or fewer`);
+      return;
+    }
+    if (tooLong(form.address, LIMITS.address)) {
+      toast.error(`Address must be ${LIMITS.address} characters or fewer`);
+      return;
+    }
     try {
-      await setDoc(doc(db, "settings", "clinic"), {
-        clinicName: form.clinicName.trim(), address: form.address.trim(), phone: form.phone.trim(), email: form.email.trim(),
-      }, { merge: true });
+      await setDoc(
+        doc(db, "settings", "clinic"),
+        {
+          clinicName: form.clinicName.trim(),
+          address: form.address.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+        },
+        { merge: true },
+      );
       toast.success("Saved");
-    } catch (e) { toast.error(e.message); }
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
 
   const addClosed = async () => {
@@ -100,7 +126,9 @@ const [loading, setLoading] = useState(true);
     try {
       await setDoc(doc(db, "settings", "clinic"), { closedDates: updated }, { merge: true });
       toast.success("Saved");
-    } catch (e) { toast.error(e.message); }
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
   const removeClosed = async (d) => {
     const updated = (form.closedDates || []).filter((x) => x !== d);
@@ -108,7 +136,9 @@ const [loading, setLoading] = useState(true);
     try {
       await setDoc(doc(db, "settings", "clinic"), { closedDates: updated }, { merge: true });
       toast.success("Saved");
-    } catch (e) { toast.error(e.message); }
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
 
   const toggleDay = (i) => {
@@ -118,13 +148,21 @@ const [loading, setLoading] = useState(true);
     }));
   };
 
-  if (loading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
+  if (loading)
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
       <Card>
-        <CardHeader><CardTitle>Schedule</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Schedule</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2 flex-wrap">
             {DAY_ORDER.map((i) => (
@@ -135,8 +173,24 @@ const [loading, setLoading] = useState(true);
             ))}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><Label>Open time</Label><Input type="time" className="w-full" value={form.openTime} onChange={(e) => setForm({ ...form, openTime: e.target.value })} /></div>
-            <div><Label>Close time</Label><Input type="time" className="w-full" value={form.closeTime} onChange={(e) => setForm({ ...form, closeTime: e.target.value })} /></div>
+            <div>
+              <Label>Open time</Label>
+              <Input
+                type="time"
+                className="w-full"
+                value={form.openTime}
+                onChange={(e) => setForm({ ...form, openTime: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Close time</Label>
+              <Input
+                type="time"
+                className="w-full"
+                value={form.closeTime}
+                onChange={(e) => setForm({ ...form, closeTime: e.target.value })}
+              />
+            </div>
             <div className="flex items-center gap-2 sm:col-span-2">
               <Checkbox
                 checked={!form.breakStart && !form.breakEnd}
@@ -147,47 +201,123 @@ const [loading, setLoading] = useState(true);
               />
               <span className="text-sm">No break</span>
             </div>
-            <div><Label>Break start</Label><Input type="time" className="w-full" value={form.breakStart || ""} onChange={(e) => setForm({ ...form, breakStart: e.target.value })} disabled={!form.breakStart && !form.breakEnd} /></div>
-            <div><Label>Break end</Label><Input type="time" className="w-full" value={form.breakEnd || ""} onChange={(e) => setForm({ ...form, breakEnd: e.target.value })} disabled={!form.breakStart && !form.breakEnd} /></div>
+            <div>
+              <Label>Break start</Label>
+              <Input
+                type="time"
+                className="w-full"
+                value={form.breakStart || ""}
+                onChange={(e) => setForm({ ...form, breakStart: e.target.value })}
+                disabled={!form.breakStart && !form.breakEnd}
+              />
+            </div>
+            <div>
+              <Label>Break end</Label>
+              <Input
+                type="time"
+                className="w-full"
+                value={form.breakEnd || ""}
+                onChange={(e) => setForm({ ...form, breakEnd: e.target.value })}
+                disabled={!form.breakStart && !form.breakEnd}
+              />
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">Slot length: 30 min (fixed)</p>
           <Button onClick={saveSchedule}>Save schedule</Button>
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle>Closed dates</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Closed dates</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_auto] gap-2 items-end">
-            <div className="min-w-0"><Label>From</Label><Input type="date" className="w-full" value={newClosed} onChange={(e) => setNewClosed(e.target.value)} /></div>
-            <div className="min-w-0"><Label>To</Label><Input type="date" className="w-full" value={newClosedEnd} onChange={(e) => setNewClosedEnd(e.target.value)} /></div>
-            <Button className="w-full sm:col-span-2 xl:col-span-1 xl:w-auto" onClick={addClosed}>Add date</Button>
+            <div className="min-w-0">
+              <Label>From</Label>
+              <Input type="date" className="w-full" value={newClosed} onChange={(e) => setNewClosed(e.target.value)} />
+            </div>
+            <div className="min-w-0">
+              <Label>To</Label>
+              <Input
+                type="date"
+                className="w-full"
+                value={newClosedEnd}
+                onChange={(e) => setNewClosedEnd(e.target.value)}
+              />
+            </div>
+            <Button className="w-full sm:col-span-2 xl:col-span-1 xl:w-auto" onClick={addClosed}>
+              Add date
+            </Button>
           </div>
           <p className="text-xs text-[#6b6b6b]">Leave end date empty for a single day.</p>
           <ul className="space-y-1">
             {(form.closedDates || []).map((d) => (
               <li key={d} className="flex justify-between">
                 <span>{d}</span>
-                <Button variant="ghost" size="sm" onClick={() => removeClosed(d)}>Remove</Button>
+                <Button variant="ghost" size="sm" onClick={() => removeClosed(d)}>
+                  Remove
+                </Button>
               </li>
             ))}
           </ul>
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle>Clinic info</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Clinic info</CardTitle>
+        </CardHeader>
         <CardContent className="space-y-4">
-          <div><Label>Clinic name</Label><Input value={form.clinicName} maxLength={LIMITS.clinicName} onChange={(e) => setForm({ ...form, clinicName: e.target.value })} /></div>
-          <div><Label>Address</Label><Input value={form.address} maxLength={LIMITS.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-          <div><Label>Phone</Label><Input value={form.phone} maxLength={LIMITS.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-          <div><Label>Email</Label><Input value={form.email} maxLength={LIMITS.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div>
+            <Label>Clinic name</Label>
+            <Input
+              value={form.clinicName}
+              maxLength={LIMITS.clinicName}
+              onChange={(e) => setForm({ ...form, clinicName: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Address</Label>
+            <Input
+              value={form.address}
+              maxLength={LIMITS.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Phone</Label>
+            <Input
+              value={form.phone}
+              maxLength={LIMITS.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input
+              value={form.email}
+              maxLength={LIMITS.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
           <Button onClick={saveInfo}>Save info</Button>
         </CardContent>
       </Card>
       {import.meta.env.DEV && (
         <Card>
-          <CardHeader><CardTitle>Dev only</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Dev only</CardTitle>
+          </CardHeader>
           <CardContent>
-            <Button onClick={async () => { try { await seedSampleData(); toast.success("Seeded"); } catch (e) { toast.error(e.message); } }}>
+            <Button
+              onClick={async () => {
+                try {
+                  await seedSampleData();
+                  toast.success("Seeded");
+                } catch (e) {
+                  toast.error(e.message);
+                }
+              }}
+            >
               Seed sample data
             </Button>
           </CardContent>

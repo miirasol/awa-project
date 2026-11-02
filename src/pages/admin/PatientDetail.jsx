@@ -23,8 +23,9 @@ export default function PatientDetail() {
   const [appts, setAppts] = useState([]);
   const [records, setRecords] = useState([]);
   const [open, setOpen] = useState(false);
-  const [detailsAppt, setDetailsAppt] = useState(null);  const [editing, setEditing] = useState(null);
-const [lightboxSrc, setLightboxSrc] = useState(null);
+  const [detailsAppt, setDetailsAppt] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
   const [selectedAppt, setSelectedAppt] = useState("");
   const [procedure, setProcedure] = useState("");
   const [notes, setNotes] = useState("");
@@ -39,14 +40,22 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
     const a = await getDocs(query(collection(db, "appointments"), where("patientId", "==", uid)));
     setAppts(a.docs.map((d) => ({ id: d.id, ...d.data() })));
     const r = await getDocs(query(collection(db, "visitRecords"), where("patientId", "==", uid)));
-    setRecords(r.docs.map((d) => ({ id: d.id, ...d.data() })).sort((x, y) => (y.createdAt?.seconds || 0) - (x.createdAt?.seconds || 0)));
+    setRecords(
+      r.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .sort((x, y) => (y.createdAt?.seconds || 0) - (x.createdAt?.seconds || 0)),
+    );
     setLoading(false);
   };
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- load patient data when uid changes
-  useEffect(() => { load(); }, [uid]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- load patient data when uid changes
+    load();
+  }, [uid]);
 
-  const completedWithoutRecord = appts.filter((a) => a.status === "completed" && !records.some((r) => r.appointmentId === a.id));
+  const completedWithoutRecord = appts.filter(
+    (a) => a.status === "completed" && !records.some((r) => r.appointmentId === a.id),
+  );
 
   const openNew = () => {
     if (completedWithoutRecord.length === 0) {
@@ -75,11 +84,21 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
   };
 
   const save = async () => {
-    if (!procedure.trim()) { toast.error("Procedure is required"); return; }
+    if (!procedure.trim()) {
+      toast.error("Procedure is required");
+      return;
+    }
     try {
       const urls = [...existingUrls];
       for (const f of files) urls.push(await uploadImage(f));
-      const data = { appointmentId: selectedAppt, patientId: uid, procedure, notes, nextVisitSuggestion: nextVisit, attachmentUrls: urls };
+      const data = {
+        appointmentId: selectedAppt,
+        patientId: uid,
+        procedure,
+        notes,
+        nextVisitSuggestion: nextVisit,
+        attachmentUrls: urls,
+      };
       if (editing) {
         await updateDoc(doc(db, "visitRecords", editing.id), data);
       } else {
@@ -89,7 +108,9 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
       setOpen(false);
       load();
       toast.success("Saved");
-    } catch (e) { toast.error(e.message); }
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
 
   if (loading) return <Skeleton className="h-64 w-full" />;
@@ -99,11 +120,17 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
     <div className="space-y-6">
       <Card>
         <CardContent className="p-4 flex items-center gap-4">
-          {patient.avatarUrl && <img src={patient.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />}
+          {patient.avatarUrl && (
+            <img src={patient.avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />
+          )}
           <div className="min-w-0 break-words">
             <h1 className="text-2xl font-semibold">{patient.fullName || "Unnamed patient"}</h1>
-            <p className="text-sm text-[#6b6b6b] break-all">{patient.email} · {patient.phone}</p>
-            <p className="text-sm text-[#6b6b6b]">{patient.birthdate} · {patient.address}</p>
+            <p className="text-sm text-[#6b6b6b] break-all">
+              {patient.email} · {patient.phone}
+            </p>
+            <p className="text-sm text-[#6b6b6b]">
+              {patient.birthdate} · {patient.address}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -116,12 +143,19 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
           <div className="space-y-2">
             {appts.length === 0 && <p className="text-[#6b6b6b]">No appointments.</p>}
             {appts.map((a) => (
-              <Card key={a.id}><CardContent className="p-3 flex justify-between items-center">
-                <span className="min-w-0 break-words">{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}</span>
-                <Button size="sm" variant="outline" onClick={() => setDetailsAppt(a)}>Details</Button>
-              </CardContent></Card>
+              <Card key={a.id}>
+                <CardContent className="p-3 flex justify-between items-center">
+                  <span className="min-w-0 break-words">
+                    {formatDate(a.date)} {formatTime(a.time)} · {a.serviceName} · {statusLabel(a.status)}
+                  </span>
+                  <Button size="sm" variant="outline" onClick={() => setDetailsAppt(a)}>
+                    Details
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
-          </div>        </TabsContent>
+          </div>{" "}
+        </TabsContent>
         <TabsContent value="records" className="space-y-3">
           <Button onClick={openNew}>Add visit record</Button>
           {records.length === 0 && <p className="text-[#6b6b6b]">No visit records yet.</p>}
@@ -134,9 +168,20 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
                 {r.nextVisitSuggestion && <p className="text-sm text-[#6b6b6b]">Next: {r.nextVisitSuggestion}</p>}
                 {r.attachmentUrls?.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {r.attachmentUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-16 h-16 object-cover rounded cursor-pointer" onClick={() => setLightboxSrc(u)} />)}                  </div>
+                    {r.attachmentUrls.map((u, i) => (
+                      <img
+                        key={i}
+                        src={u}
+                        alt={`Attachment ${i + 1}`}
+                        className="w-16 h-16 object-cover rounded cursor-pointer"
+                        onClick={() => setLightboxSrc(u)}
+                      />
+                    ))}{" "}
+                  </div>
                 )}
-                <Button size="sm" variant="outline" onClick={() => openEdit(r)}>Edit</Button>
+                <Button size="sm" variant="outline" onClick={() => openEdit(r)}>
+                  Edit
+                </Button>
               </CardContent>
             </Card>
           ))}
@@ -144,25 +189,47 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
       </Tabs>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{editing ? "Edit visit record" : "Add visit record"}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{editing ? "Edit visit record" : "Add visit record"}</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
             {!editing && (
               <div>
                 <Label>Appointment</Label>
-                <select className="border rounded p-2 w-full" value={selectedAppt} onChange={(e) => setSelectedAppt(e.target.value)}>
+                <select
+                  className="border rounded p-2 w-full"
+                  value={selectedAppt}
+                  onChange={(e) => setSelectedAppt(e.target.value)}
+                >
                   {completedWithoutRecord.map((a) => (
-                    <option key={a.id} value={a.id}>{formatDate(a.date)} {formatTime(a.time)} · {a.serviceName}</option>
+                    <option key={a.id} value={a.id}>
+                      {formatDate(a.date)} {formatTime(a.time)} · {a.serviceName}
+                    </option>
                   ))}
                 </select>
               </div>
             )}
-            <div><Label>Procedure</Label><Input value={procedure} onChange={(e) => setProcedure(e.target.value)} /></div>
-            <div><Label>Notes</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
-            <div><Label>Next visit suggestion</Label><Input value={nextVisit} onChange={(e) => setNextVisit(e.target.value)} /></div>
-            <div><Label>Images</Label><Input type="file" accept="image/*" multiple onChange={(e) => setFiles(Array.from(e.target.files))} /></div>
+            <div>
+              <Label>Procedure</Label>
+              <Input value={procedure} onChange={(e) => setProcedure(e.target.value)} />
+            </div>
+            <div>
+              <Label>Notes</Label>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
+            <div>
+              <Label>Next visit suggestion</Label>
+              <Input value={nextVisit} onChange={(e) => setNextVisit(e.target.value)} />
+            </div>
+            <div>
+              <Label>Images</Label>
+              <Input type="file" accept="image/*" multiple onChange={(e) => setFiles(Array.from(e.target.files))} />
+            </div>
             {existingUrls.length > 0 && (
               <div className="flex gap-2">
-                {existingUrls.map((u, i) => <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-12 h-12 object-cover rounded" />)}
+                {existingUrls.map((u, i) => (
+                  <img key={i} src={u} alt={`Attachment ${i + 1}`} className="w-12 h-12 object-cover rounded" />
+                ))}
               </div>
             )}
           </div>
@@ -171,7 +238,11 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <AppointmentDetailsDialog open={!!detailsAppt} onOpenChange={() => setDetailsAppt(null)} appointment={detailsAppt} />
+      <AppointmentDetailsDialog
+        open={!!detailsAppt}
+        onOpenChange={() => setDetailsAppt(null)}
+        appointment={detailsAppt}
+      />
       <ImageLightbox src={lightboxSrc} open={!!lightboxSrc} onOpenChange={() => setLightboxSrc(null)} />
     </div>
   );

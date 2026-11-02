@@ -20,92 +20,92 @@ const PatientDetail = lazy(() => import("@/pages/admin/PatientDetail.jsx"));
 import NotFound from "@/pages/NotFound.jsx";
 
 const titles = {
-	"/": "Landing",
-	"/login": "Login",
-	"/register": "Create Account",
-	"/book": "Book",
-	"/dashboard": "Dashboard",
-	"/profile": "Profile",
-	"/admin/appointments": "Appointments",
-	"/admin/patients": "Patients",
-	"/admin/services": "Services",
-	"/admin/settings": "Settings",
+  "/": "Landing",
+  "/login": "Login",
+  "/register": "Create Account",
+  "/book": "Book",
+  "/dashboard": "Dashboard",
+  "/profile": "Profile",
+  "/admin/appointments": "Appointments",
+  "/admin/patients": "Patients",
+  "/admin/services": "Services",
+  "/admin/settings": "Settings",
 };
 
 function PageTitle() {
-	const location = useLocation();
-	useEffect(() => {
-		document.title = titles[location.pathname] || "Clinic Appointment System";
-	}, [location.pathname]);
-	return null;
+  const location = useLocation();
+  useEffect(() => {
+    document.title = titles[location.pathname] || "Clinic Appointment System";
+  }, [location.pathname]);
+  return null;
 }
 
 function GuestOnly({ children }) {
-	const { user, profile, loading } = useAuth();
-	if (loading) return <div className="p-8"><div className="h-8 w-48 animate-pulse rounded bg-[#f0f0f0]" /></div>;
-	if (user) {
-		return (
-			<Navigate
-				to={profile?.role === "admin" ? "/admin/appointments" : "/dashboard"}
-				replace
-			/>
-		);
-	}
-	return children;
+  const { user, profile, loading } = useAuth();
+  if (loading)
+    return (
+      <div className="p-8">
+        <div className="h-8 w-48 animate-pulse rounded bg-[#f0f0f0]" />
+      </div>
+    );
+  if (user) {
+    return <Navigate to={profile?.role === "admin" ? "/admin/appointments" : "/dashboard"} replace />;
+  }
+  return children;
 }
 
 export default function App() {
-	return (
-		<>
-			<PageTitle />
-			<Suspense fallback={<Skeleton className="h-screen w-full" />}>
-			<Routes>
-				<Route element={<PublicLayout />}>
-					<Route path="/" element={<Landing />} />
-					<Route
-						path="/login"
-						element={
-							<GuestOnly>
-								<Login />
-							</GuestOnly>
-						}
-					/>
-					<Route
-						path="/register"
-						element={
-							<GuestOnly>
-								<Register />
-							</GuestOnly>
-						}
-					/>
-				</Route>
-				<Route
-					element={
-						<ProtectedRoute role="patient">
-							<PatientLayout />
-						</ProtectedRoute>
-					}
-				>
-					<Route path="/book" element={<Book />} />
-					<Route path="/dashboard" element={<Dashboard />} />
-					<Route path="/profile" element={<Profile />} />
-				</Route>
-				<Route
-					element={
-						<ProtectedRoute role="admin">
-							<AdminLayout />
-						</ProtectedRoute>
-					}
-				>
-					<Route path="/admin/appointments" element={<Appointments />} />
-					<Route path="/admin/services" element={<Services />} />
-					<Route path="/admin/settings" element={<Settings />} />
-					<Route path="/admin/patients" element={<Patients />} />
-					<Route path="/admin/patients/:uid" element={<PatientDetail />} />
-				</Route>
-				<Route path="*" element={<NotFound />} />
-			</Routes>
-			</Suspense>
-		</>
-	);
+  return (
+    <>
+      <PageTitle />
+      <Suspense fallback={<Skeleton className="h-screen w-full" />}>
+        <Routes>
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route
+              path="/login"
+              element={
+                <GuestOnly>
+                  <Login />
+                </GuestOnly>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <GuestOnly>
+                  <Register />
+                </GuestOnly>
+              }
+            />
+          </Route>
+          <Route
+            element={
+              <ProtectedRoute role="patient">
+                <PatientLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/book" element={<Book />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          <Route
+            element={
+              <ProtectedRoute role="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/admin/appointments" element={<Appointments />} />
+            <Route path="/admin/services" element={<Services />} />
+            <Route path="/admin/settings" element={<Settings />} />
+            <Route path="/admin/patients" element={<Patients />} />
+            <Route path="/admin/patients/:uid" element={<PatientDetail />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </>
+  );
 }
