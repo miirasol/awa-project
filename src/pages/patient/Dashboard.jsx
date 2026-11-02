@@ -307,7 +307,8 @@ export default function Dashboard() {
 					</DialogHeader>
 					{confirmAppt && (
 						<p className="break-words text-[#6b6b6b]">
-							{confirmAppt.serviceName} · {confirmAppt.date} {confirmAppt.time}
+							{confirmAppt.serviceName} · {formatDate(confirmAppt.date)}{" "}
+							{formatTime(confirmAppt.time)}
 						</p>
 					)}
 					<p className="text-sm text-[#6b6b6b]">
@@ -320,7 +321,9 @@ export default function Dashboard() {
 							No, keep it
 						</Button>
 						<Button variant="destructive" onClick={doCancel}>
-							Yes
+							{action === "cancel"
+								? "Cancel Appointment"
+								: "Request Cancellation"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
