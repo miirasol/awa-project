@@ -39,6 +39,7 @@ const [deleteWarning, setDeleteWarning] = useState(false);
     }
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load services on mount
   useEffect(() => { load(); }, []);
 
   const openNew = () => {

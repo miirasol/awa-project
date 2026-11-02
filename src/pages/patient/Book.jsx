@@ -56,6 +56,7 @@ export default function Book() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selected slot when date changes
     setSelectedSlot(null);
     if (!date || !settings) { setSlots([]); return; }
     const ds = toDateString(date);

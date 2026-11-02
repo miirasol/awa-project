@@ -21,6 +21,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (!avatarFile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear preview when no file selected
       setAvatarPreview(null);
       return;
     }

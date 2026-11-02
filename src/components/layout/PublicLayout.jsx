@@ -12,6 +12,7 @@ export default function PublicLayout() {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- close mobile menu on route change
 		setOpen(false);
 	}, [location.pathname, location.hash]);
 

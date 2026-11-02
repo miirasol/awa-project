@@ -43,6 +43,7 @@ const [lightboxSrc, setLightboxSrc] = useState(null);
     setLoading(false);
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- load patient data when uid changes
   useEffect(() => { load(); }, [uid]);
 
   const completedWithoutRecord = appts.filter((a) => a.status === "completed" && !records.some((r) => r.appointmentId === a.id));
