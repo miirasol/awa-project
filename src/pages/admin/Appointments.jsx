@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import StatusBadge from "@/components/StatusBadge";
+import { useLastDefined } from "@/lib/useLastDefined";
 
 const HISTORY_PAGE = 25;
 
@@ -201,6 +202,7 @@ export default function Appointments() {
 	const [search, setSearch] = useState("");
 	const [shown, setShown] = useState(HISTORY_PAGE);
 	const [confirm, setConfirm] = useState(null);
+	const shownConfirm = useLastDefined(confirm);
 	const [detailsAppt, setDetailsAppt] = useState(null);
 
 	useEffect(() => {
@@ -526,22 +528,22 @@ export default function Appointments() {
 			<Dialog open={!!confirm} onOpenChange={() => setConfirm(null)}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>{confirm?.title || "Confirm action"}</DialogTitle>
+						<DialogTitle>{shownConfirm?.title || "Confirm action"}</DialogTitle>
 					</DialogHeader>
-					{confirm && (
+					{shownConfirm && (
 						<>
 							<p className="break-words text-[#6b6b6b]">
-								{nameOf(confirm.appt.patientId)} · {confirm.appt.serviceName} ·{" "}
-								{formatDate(confirm.appt.date)} {formatTime(confirm.appt.time)}
+								{nameOf(shownConfirm.appt.patientId)} · {shownConfirm.appt.serviceName} ·{" "}
+								{formatDate(shownConfirm.appt.date)} {formatTime(shownConfirm.appt.time)}
 							</p>
 							<p className="text-sm text-[#6b6b6b]">
-								{confirm.fn === cancelAppointment
+								{shownConfirm.fn === cancelAppointment
 									? "This will free up the time slot."
-									: confirm.fn === markCompleted
+									: shownConfirm.fn === markCompleted
 										? "Mark this appointment as completed."
-										: confirm.fn === markNoShow
+										: shownConfirm.fn === markNoShow
 											? "Mark this appointment as no-show."
-											: confirm.fn === rejectCancellation
+											: shownConfirm.fn === rejectCancellation
 												? "Return this appointment to confirmed."
 												: "Confirm this action."}
 							</p>
@@ -553,19 +555,19 @@ export default function Appointments() {
 						</Button>
 						<Button
 							variant={
-								confirm?.fn === markCompleted ? "default" : "destructive"
+								shownConfirm?.fn === markCompleted ? "default" : "destructive"
 							}
 							onClick={() => run(confirm.fn, confirm.appt)}
 						>
-							{confirm?.fn === cancelAppointment
+							{shownConfirm?.fn === cancelAppointment
 								? "Cancel Appointment"
-								: confirm?.fn === markCompleted
+								: shownConfirm?.fn === markCompleted
 									? "Complete"
-									: confirm?.fn === markNoShow
+									: shownConfirm?.fn === markNoShow
 										? "No-show"
-										: confirm?.fn === approveCancellation
+										: shownConfirm?.fn === approveCancellation
 											? "Approve"
-											: confirm?.fn === rejectCancellation
+											: shownConfirm?.fn === rejectCancellation
 												? "Reject"
 												: "Confirm"}
 						</Button>

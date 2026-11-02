@@ -21,6 +21,7 @@ import {
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import ImageLightbox from "@/components/ImageLightbox";
 import { formatDate, formatTime } from "@/lib/format";
+import { useLastDefined } from "@/lib/useLastDefined";
 
 export default function Dashboard() {
 	const { user } = useAuth();
@@ -29,6 +30,8 @@ export default function Dashboard() {
 	const [records, setRecords] = useState([]);
 	const [confirmAppt, setConfirmAppt] = useState(null);
 	const [action, setAction] = useState(null);
+	const shownAppt = useLastDefined(confirmAppt);
+	const shownAction = useLastDefined(action);
 	const [detailsAppt, setDetailsAppt] = useState(null);
 	const [lightboxSrc, setLightboxSrc] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -300,19 +303,19 @@ export default function Dashboard() {
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>
-							{action === "cancel"
+							{shownAction === "cancel"
 								? "Cancel this appointment?"
 								: "Request cancellation?"}
 						</DialogTitle>
 					</DialogHeader>
-					{confirmAppt && (
+					{shownAppt && (
 						<p className="break-words text-[#6b6b6b]">
-							{confirmAppt.serviceName} · {formatDate(confirmAppt.date)}{" "}
-							{formatTime(confirmAppt.time)}
+							{shownAppt.serviceName} · {formatDate(shownAppt.date)}{" "}
+							{formatTime(shownAppt.time)}
 						</p>
 					)}
 					<p className="text-sm text-[#6b6b6b]">
-						{action === "cancel"
+						{shownAction === "cancel"
 							? "This will free up the time slot."
 							: "The clinic will review your request."}
 					</p>
@@ -321,7 +324,7 @@ export default function Dashboard() {
 							No, keep it
 						</Button>
 						<Button variant="destructive" onClick={doCancel}>
-							{action === "cancel"
+							{shownAction === "cancel"
 								? "Cancel Appointment"
 								: "Request Cancellation"}
 						</Button>
