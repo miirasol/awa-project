@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { seedSampleData } from "@/lib/seed";
 import { toDateString as toDateStr } from "@/lib/dates";
 import { LIMITS, tooLong } from "@/lib/limits";
 
@@ -302,27 +301,7 @@ export default function Settings() {
           <Button onClick={saveInfo}>Save info</Button>
         </CardContent>
       </Card>
-      {import.meta.env.DEV && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Dev only</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={async () => {
-                try {
-                  await seedSampleData();
-                  toast.success("Seeded");
-                } catch (e) {
-                  toast.error(e.message);
-                }
-              }}
-            >
-              Seed sample data
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+
     </div>
   );
 }
