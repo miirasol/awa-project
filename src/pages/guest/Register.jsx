@@ -33,6 +33,10 @@ export default function Register() {
       toast.error(`Email must be ${LIMITS.email} characters or fewer.`);
       return;
     }
+    if (!/^09\d{9}$/.test(phone.trim())) {
+      toast.error("Phone must be 11 digits starting with 09.");
+      return;
+    }
     if (password.length < 8) {
       toast.error("Password must be at least 8 characters.");
       return;
@@ -97,7 +101,7 @@ export default function Register() {
               <Label htmlFor="phone">Phone</Label>
               <Input
                 value={phone}
-                maxLength={LIMITS.phone}
+                maxLength={11}
                 id="phone"
                 onChange={(e) => setPhone(e.target.value)}
                 required

@@ -67,8 +67,8 @@ export default function Profile() {
       toast.error(`Address must be ${LIMITS.address} characters or fewer`);
       return;
     }
-    if (form.phone && !/^[0-9+\-()\s]{6,}$/.test(form.phone)) {
-      toast.error("Invalid phone number");
+    if (form.phone && !/^09\d{9}$/.test(form.phone)) {
+      toast.error("Phone must be 11 digits starting with 09.");
       return;
     }
     setSaving(true);
@@ -157,7 +157,7 @@ export default function Profile() {
                 <Label className="text-xs font-medium">Phone</Label>
                 <Input
                   value={form.phone}
-                  maxLength={LIMITS.phone}
+                  maxLength={11}
                   className="h-8 text-[13px] rounded-md"
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
