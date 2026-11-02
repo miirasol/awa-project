@@ -1,3 +1,7 @@
+/**
+ * Admin appointment queue: Today/Upcoming/Needs-action/History tabs,
+ * realtime subscription, and confirm dialog for admin actions.
+ */
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";

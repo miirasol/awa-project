@@ -1,3 +1,7 @@
+/**
+ * Patient booking flow: service, date, slot, reason/photo, with the
+ * 2-appointment cap and SLOT_TAKEN handling.
+ */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";

@@ -1,3 +1,7 @@
+/**
+ * Firebase Auth wrapper. Provides user, profile, role, loading and
+ * login/register/google/logout. Admin accounts are created in the console.
+ */
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
   onAuthStateChanged,

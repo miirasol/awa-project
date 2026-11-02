@@ -1,3 +1,8 @@
+/**
+ * Firestore operations for appointments: booking (transactional slot guard),
+ * cancelling, admin status changes, and visit-record writes.
+ * All dates are 'YYYY-MM-DD' strings; startAt is a Timestamp.
+ */
 import {
   runTransaction,
   writeBatch,
