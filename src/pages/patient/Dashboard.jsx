@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import ImageLightbox from "@/components/ImageLightbox";
-
+import { formatDate, formatTime } from "@/lib/format";
 
 export default function Dashboard() {
 	const { user } = useAuth();
@@ -30,8 +30,8 @@ export default function Dashboard() {
 	const [confirmAppt, setConfirmAppt] = useState(null);
 	const [action, setAction] = useState(null);
 	const [detailsAppt, setDetailsAppt] = useState(null);
-const [lightboxSrc, setLightboxSrc] = useState(null);
-const [loading, setLoading] = useState(true);
+	const [lightboxSrc, setLightboxSrc] = useState(null);
+	const [loading, setLoading] = useState(true);
 	useEffect(() => {
 		if (!user) return;
 		const q = query(
@@ -67,15 +67,6 @@ const [loading, setLoading] = useState(true);
 	const past = appts
 		.filter((a) => a.startAt.toDate() <= now)
 		.sort((a, b) => b.startAt.toDate() - a.startAt.toDate());
-
-	const fmt = (d) =>
-		d.toLocaleString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-			hour: "numeric",
-			minute: "2-digit",
-		});
 
 	const historyItems = (() => {
 		const completed = past.filter((a) => a.status === "completed");
@@ -114,7 +105,14 @@ const [loading, setLoading] = useState(true);
 		setAction(null);
 	};
 
-	if (loading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>;
+	if (loading)
+		return (
+			<div className="space-y-4">
+				<Skeleton className="h-8 w-48" />
+				<Skeleton className="h-24 w-full" />
+				<Skeleton className="h-24 w-full" />
+			</div>
+		);
 
 	return (
 		<div className="space-y-6">
@@ -154,7 +152,7 @@ const [loading, setLoading] = useState(true);
 								<div className="min-w-0">
 									<p className="font-semibold break-words">{a.serviceName}</p>
 									<p className="text-sm text-[#6b6b6b]">
-										{a.date} {a.time}
+										{formatDate(a.date)} · {formatTime(a.time)}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2 justify-end">
@@ -214,54 +212,79 @@ const [loading, setLoading] = useState(true);
 						const a = item.appt;
 						const r = item.record;
 						const label = a ? a.serviceName : r?.procedure || "Visit";
-						const dateStr = a ? fmt(a.startAt.toDate()) : r?.date || "";
+						const dateStr = a
+							? `${formatDate(a.date)} · ${formatTime(a.time)}`
+							: r?.date
+								? formatDate(r.date)
+								: "";
+						const showProcedure =
+							r?.procedure &&
+							r.procedure.trim().toLowerCase() !==
+								String(label).trim().toLowerCase();
+						const photos = r?.attachmentUrls || [];
 						return (
 							<Card key={item.kind === "appt" ? a.id : r.id}>
-								<CardContent className="p-4 break-words">
-									<div className="flex justify-between items-center gap-2">
-										<p className="font-semibold min-w-0">{label}</p>
-										<StatusBadge status="completed" />
+								<CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+									<div className="min-w-0">
+										<p className="font-semibold break-words">{label}</p>
+										<p className="text-sm text-[#6b6b6b]">{dateStr}</p>
+										{showProcedure && (
+											<p className="text-sm mt-1 break-words">{r.procedure}</p>
+										)}
+										{r?.notes && (
+											<p
+												className={`text-sm mt-1 break-words ${a ? "line-clamp-2" : ""}`}
+											>
+												{r.notes}
+											</p>
+										)}
+										{r?.nextVisitSuggestion && (
+											<p className="text-sm text-[#6b6b6b] break-words">
+												Next: {r.nextVisitSuggestion}
+											</p>
+										)}
+										{photos.length > 0 && (
+											<div className="flex flex-wrap items-center gap-2 mt-2">
+												{photos.slice(0, 4).map((u, i) => (
+													<img
+														key={i}
+														src={u}
+														alt={`Attachment ${i + 1}`}
+														className="w-12 h-12 object-cover rounded cursor-pointer"
+														onClick={() => setLightboxSrc(u)}
+													/>
+												))}
+												{photos.length > 4 && (
+													<span className="text-xs text-[#6b6b6b]">
+														+{photos.length - 4} more
+													</span>
+												)}
+											</div>
+										)}
 									</div>
-									<p className="text-sm text-[#6b6b6b]">{dateStr}</p>
-									{r?.procedure && (
-										<p className="text-sm mt-1">{r.procedure}</p>
-									)}
-									{r?.notes && <p className="text-sm mt-1">{r.notes}</p>}
-									{r?.nextVisitSuggestion && (
-										<p className="text-sm text-[#6b6b6b]">
-											Next: {r.nextVisitSuggestion}
-										</p>
-									)}
-									{r?.attachmentUrls?.length > 0 && (
-										<div className="flex gap-2 mt-2">
-											{r.attachmentUrls.map((u, i) => (
-												<img
-													key={i}
-													src={u}
-													alt={`Attachment ${i + 1}`}
-													className="w-16 h-16 object-cover rounded cursor-pointer"
-													onClick={() => setLightboxSrc(u)}
-												/>
-											))}
-										</div>
-									)}
-									{a && (
-										<Button
-											className="mt-2"
-											variant="outline"
-											size="sm"
-											onClick={() => setDetailsAppt(a)}
-										>
-											Details
-										</Button>
-									)}
+									<div className="flex flex-wrap items-center gap-2 sm:justify-end sm:shrink-0">
+										<StatusBadge status="completed" />
+										{a && (
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={() => setDetailsAppt(a)}
+											>
+												Details
+											</Button>
+										)}
+									</div>
 								</CardContent>
 							</Card>
 						);
-					})}{" "}
+					})}
 				</TabsContent>
 			</Tabs>
-			<ImageLightbox src={lightboxSrc} open={!!lightboxSrc} onOpenChange={() => setLightboxSrc(null)} />
+			<ImageLightbox
+				src={lightboxSrc}
+				open={!!lightboxSrc}
+				onOpenChange={() => setLightboxSrc(null)}
+			/>
 			<AppointmentDetailsDialog
 				open={!!detailsAppt}
 				onOpenChange={() => setDetailsAppt(null)}
@@ -296,7 +319,9 @@ const [loading, setLoading] = useState(true);
 						<Button variant="outline" onClick={() => setConfirmAppt(null)}>
 							No, keep it
 						</Button>
-						<Button variant="destructive" onClick={doCancel}>Yes</Button>
+						<Button variant="destructive" onClick={doCancel}>
+							Yes
+						</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
