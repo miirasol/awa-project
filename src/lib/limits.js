@@ -4,8 +4,8 @@ export const LIMITS = {
   clinicName: 60,
   serviceName: 60,
   address: 120,
-  email: 254,
-  phone: 20,
+  email: 100,
+  phone: 11,
   reason: 500,
 };
 

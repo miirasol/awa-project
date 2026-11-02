@@ -31,16 +31,16 @@ service cloud.firestore {
 
     function validProfile(d) {
       return okStr(d.get('fullName', ''), 60)
-        && okStr(d.get('email', ''), 254)
-        && okStr(d.get('phone', ''), 20)
+        && okStr(d.get('email', ''), 100)
+        && okStr(d.get('phone', ''), 11)
         && okStr(d.get('address', ''), 120);
     }
 
     function validClinicInfo(d) {
       return okStr(d.get('clinicName', ''), 60)
         && okStr(d.get('address', ''), 120)
-        && okStr(d.get('phone', ''), 20)
-        && okStr(d.get('email', ''), 254);
+        && okStr(d.get('phone', ''), 11)
+        && okStr(d.get('email', ''), 100);
     }
 
     // ---------- users ----------
