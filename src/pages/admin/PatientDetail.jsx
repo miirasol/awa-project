@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
-import ImageLightbox from "@/components/ImageLightbox";import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ImageLightbox from "@/components/ImageLightbox";
 import { statusLabel, formatDate, formatTime } from "@/lib/format";
 
 export default function PatientDetail() {

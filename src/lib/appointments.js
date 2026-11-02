@@ -1,4 +1,4 @@
-import { runTransaction, writeBatch, updateDoc, doc, collection, query, where, getDocs, serverTimestamp, Timestamp } from "firebase/firestore";
+import { runTransaction, writeBatch, updateDoc, doc, collection, query, where, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { slotId, toStartAt } from "@/lib/dates";
 

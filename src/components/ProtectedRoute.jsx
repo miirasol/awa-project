@@ -3,7 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProtectedRoute({ children, role }) {
-  const { user, profile, loading, role: userRole } = useAuth();
+  const { user, loading, role: userRole } = useAuth();
   const location = useLocation();
   if (loading) return (
     <div className="p-8 space-y-4">

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { slotId, toStartAt, toDateString, generateSlots, hoursUntil, canCancelDirectly, canRequestCancel } from "./dates";
+import { slotId, toStartAt, toDateString, generateSlots, canCancelDirectly, canRequestCancel } from "./dates";
 import { Timestamp } from "firebase/firestore";
 
 describe("slotId", () => {
