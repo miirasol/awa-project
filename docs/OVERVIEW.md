@@ -31,7 +31,7 @@ src/
 See `docs/data-model.md` for full field tables. Summary:
 
 - `users/{uid}` — profile + role.
-- `services/{id}` — service catalog (isActive toggles bookability; never deleted).
+- `services/{id}` — service catalog (isActive toggles bookability). Admins can delete a service; they are warned if it still has confirmed or cancel-requested appointments. Past appointments keep working because each stores a copy of serviceName.
 - `appointments/{id}` — bookings with status (`confirmed`, `cancel_requested`, `cancelled`, `completed`, `no_show`).
 - `slots/{date_time}` — double-booking guard; exists only while a time is taken.
 - `visitRecords/{id}` — admin-written visit notes per appointment.
@@ -39,7 +39,7 @@ See `docs/data-model.md` for full field tables. Summary:
 
 ## Booking and the slot double-booking guard
 
-`src/lib/slots.js` generates candidate slots from settings. `src/lib/appointments.js` `bookAppointment` runs a Firestore transaction: it reads `slots/{date_time}`; if it exists, throws `SLOT_TAKEN`; otherwise it writes both the slot doc and the appointment doc atomically. The slot doc is the guard — it exists only while the time is taken and is deleted when an appointment becomes `cancelled`.
+`src/lib/dates.js` generates candidate slots from settings (`generateSlots`); `src/lib/slots.js` is a one-line re-export of it. `src/lib/appointments.js` `bookAppointment` runs a Firestore transaction: it reads `slots/{date_time}`; if it exists, throws `SLOT_TAKEN`; otherwise it writes both the slot doc and the appointment doc atomically. The slot doc is the guard — it exists only while the time is taken and is deleted when an appointment becomes `cancelled`.
 
 Before booking, the patient's confirmed future appointments are counted; 2 or more blocks booking (app-level cap). Photos are uploaded to Cloudinary first, then the URL is stored on the appointment.
 
@@ -49,10 +49,10 @@ Dates are stored as `"YYYY-MM-DD"` strings and built from local date parts (neve
 
 `src/pages/admin/Appointments.jsx` subscribes to all appointments and users. `src/lib/appointmentViews.js` (`buildViews`) splits them into:
 
-- **Today** — appointments whose date equals today.
-- **Upcoming** — confirmed appointments after today, grouped by date.
+- **Today** — today's appointments except cancelled ones.
+- **Upcoming** — confirmed and cancel-requested appointments on later days, grouped by date.
 - **Needs action** — cancellation requests plus past confirmed appointments still to mark (completed/no-show).
-- **History** — everything else, filterable by status, date range, and search.
+- **History** — only completed, no-show, and cancelled appointments, filterable by status, date range, and search.
 
 Stat cards at the top link to the relevant tab.
 
