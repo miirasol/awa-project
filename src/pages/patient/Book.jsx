@@ -108,6 +108,7 @@ export default function Book() {
     try {
       let photoUrl = "";
       if (photoFile) photoUrl = await uploadImage(photoFile);
+
       const ds = toDateString(date);
       await bookAppointment({
         uid: user.uid,
