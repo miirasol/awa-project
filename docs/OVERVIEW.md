@@ -8,10 +8,10 @@ Stack: Vite 8 + React 19 (JavaScript), Tailwind 4, shadcn/ui on Base UI, Firebas
 
 ```
 src/
-  lib/          firebase.js, cloudinary.js, dates.js, slots.js, appointments.js, seed.js, useLastDefined.js, utils.js, format.js, limits.js
+  lib/          firebase.js, cloudinary.js, dates.js, slots.js, appointments.js, appointmentViews.js, authErrors.js, useLastDefined.js, utils.js, format.js, limits.js (+ *.test.js)
   context/      AuthContext.jsx
   components/   ui/ (shadcn), layout/ (Public/Patient/Admin layouts), ProtectedRoute, StatusBadge, AppointmentDetailsDialog, ImageLightbox
-  pages/        guest/, patient/, admin/
+  pages/        guest/, patient/, admin/, NotFound.jsx
   App.jsx       routes
   main.jsx
 ```
@@ -47,7 +47,7 @@ Dates are stored as `"YYYY-MM-DD"` strings and built from local date parts (neve
 
 ## Admin Appointments tabs
 
-`src/pages/admin/Appointments.jsx` subscribes to all appointments and users. `src/lib/appointmentViews.js` (`buildViews`) splits them into:
+`src/pages/admin/Appointments.jsx` subscribes (`onSnapshot`) to all appointments and all users. `src/lib/appointmentViews.js` (`buildViews`) splits them into:
 
 - **Today** — today's appointments except cancelled ones.
 - **Upcoming** — confirmed and cancel-requested appointments on later days, grouped by date.
@@ -67,7 +67,7 @@ Stat cards at the top link to the relevant tab.
 | Admin appointments | `src/pages/admin/Appointments.jsx`, `src/lib/appointmentViews.js` |
 | Admin patients/records | `src/pages/admin/Patients.jsx`, `src/pages/admin/PatientDetail.jsx` |
 | Services | `src/pages/admin/Services.jsx` |
-| Settings / seed | `src/pages/admin/Settings.jsx`, `src/lib/seed.js` |
+| Settings | `src/pages/admin/Settings.jsx` |
 | Dialog close animation | `src/lib/useLastDefined.js`, `src/components/AppointmentDetailsDialog.jsx` |
 | Formatting | `src/lib/format.js` |
 | Validation limits | `src/lib/limits.js` (mirrored in `firestore.rules`) |
