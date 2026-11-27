@@ -121,6 +121,7 @@ export default function Landing() {
           />
         </div>
       </section>
+
       <section id="services" className={container + " scroll-mt-20"}>
         <h2 className="text-2xl font-semibold mb-4">Services</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -146,6 +147,7 @@ export default function Landing() {
           ))}
         </div>
       </section>
+
       <section id="about" className={container + " scroll-mt-20"}>
         <h2 className="text-2xl font-semibold mb-4">About Us</h2>
         <h3 className="text-lg font-semibold mb-3">Our specialties</h3>
